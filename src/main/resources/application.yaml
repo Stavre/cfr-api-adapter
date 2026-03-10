@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: cfr-api-adapter
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            readTimeout: 120000
+            connectTimeout: 120000
+
+cfr:
+  base-url: https://mersultrenurilor.infofer.ro
+#
+feign:
+  client:
+    config:
+      default:
+        readTimeout: 2000
+        connectTimeout: 2000
+##
+#logging:
+#  level:
+#    com.stavre.cfrapiadapter: DEBUG
