@@ -3,7 +3,7 @@ package com.stavre.cfrapiadapter.scraper;
 import com.stavre.cfrapiadapter.dto.request.RequestDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
 import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDto;
+import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
@@ -53,7 +53,7 @@ public class StationDeparturesScraper {
 
             String destinationName = getDestinationName(row);
 
-            TrainDto train = getTrain(row);
+            TrainMetadataDto train = getTrain(row);
             String mainStations = getMainStations(row);
             String stopDuration = getStopDuration(row);
 
@@ -105,7 +105,7 @@ public class StationDeparturesScraper {
         }
     }
 
-    private TrainDto getTrain(Element row) {
+    private TrainMetadataDto getTrain(Element row) {
         String trainCategory = "";
         String trainNumber = "";
         String operator = "";
@@ -121,7 +121,7 @@ public class StationDeparturesScraper {
         Element opImg = row.selectFirst("img.img-train-operator");
         operator = opImg == null ? "" : opImg.attr("alt").trim();
 
-        return new TrainDto(trainNumber, trainCategory, operator);
+        return new TrainMetadataDto(trainNumber, trainCategory, operator);
     }
 
     private String getStopDuration(Element row) {

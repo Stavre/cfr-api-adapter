@@ -2,6 +2,8 @@ package com.stavre.cfrapiadapter.scraper;
 
 import com.stavre.cfrapiadapter.dto.request.RequestDto;
 import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
+import com.stavre.cfrapiadapter.dto.train.TrainDto;
+import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
 
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
@@ -29,9 +31,31 @@ public class TrainScraper {
         return new RequestTrainTimeTableDto(date, trainRunningNumber, selectedBranchCode, verificationTokensDto);
     }
 
+    public TrainDto scrapeTrain(String html) {
+        Optional<TrainMetadataDto> metadataDto = scrapeTrainMetadata(html);
+        List<Optional<TrainStopDto>> stops = scrapeTrainTimeTable(html);
+        return new TrainDto(metadataDto, stops);
+    }
+
+    public Optional<TrainMetadataDto> scrapeTrainMetadata(String htmlPage) {
+        try {
+            Element body = Jsoup.parse(htmlPage).body();
+            Element e = body.getElementsByClass("jumbotron p-3 mb-3").getFirst().child(0).child(0);//.child(0);
+            String operator = e.child(1).text().replace("Operat de", "").trim();
+
+            String category = e.child(0).child(0).text().trim();
+            String number = e.child(0).child(1).text().trim();
+
+            return Optional.of(new TrainMetadataDto(number, category, operator));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
     public List<Optional<TrainStopDto>> scrapeTrainTimeTable(String htmlPage) {
         Element body = Jsoup.parse(htmlPage).body();
         var timeTable = getTimeTable(body);
+        scrapeTrainMetadata(htmlPage);
         return extractTrainStopsFromTimeTable(timeTable);
     }
 
@@ -61,7 +85,7 @@ public class TrainScraper {
             List<String> stationLabels = getStationLabel(row);
             String km = getKm(innerRow);
             String stopDuration = getStopDuration(innerRow);
-            String platform = getPlatform(innerRow);
+            String platform = getPlatform(row);
 
             return Optional.of(new TrainStopDto(arrivalTime, arrivalTimeLabel, departureTime, departureTimeLabel, stationName, stationLabels, km, stopDuration, platform));
         } catch (Exception e) {
@@ -135,6 +159,8 @@ public class TrainScraper {
     }
 
     private String getPlatform(Element innerRow) {
+        System.out.println("---------------------");
+        System.out.println(innerRow);
         Elements allCols = innerRow.select(".col-md-2, .col-md-3, .col-md-5");
         for (Element c : allCols) {
             String t = c.text().trim();

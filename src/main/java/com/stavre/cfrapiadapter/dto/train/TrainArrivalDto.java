@@ -5,7 +5,7 @@ public record TrainArrivalDto(
     String arrivalTimeLabel,  // "+11 min (întârziere)" or "la timp*"
     String platform,            // "linia 1", "linia 3", etc.
     String originStation,  // "București Obor"
-    TrainDto train,
+    TrainMetadataDto train,
     String mainStations,
     String stopDuration     // "1 min (începând cu 5:17)"
 ) { }

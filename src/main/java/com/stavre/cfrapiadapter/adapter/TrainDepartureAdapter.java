@@ -1,7 +1,7 @@
 package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 
@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class TrainDepartureAdapter {
 
-    private final TrainAdapter trainAdapter = new TrainAdapter();
+    private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
     private final AdapterUtils utils = new AdapterUtils();
 
     public EnrichedTrainDepartureDto adapt(Optional<TrainDepartureDto> trainDepartureDtoOpt, String date) {
@@ -33,7 +33,7 @@ public class TrainDepartureAdapter {
         String platform = utils.getTrainPlatform(trainDepartureDto.platform(), errors);
         String destination = getDestination(trainDepartureDto.destinationName(), errors);
 
-        EnrichedTrainDto train = trainAdapter.adapt(Optional.of(trainDepartureDto.train()));
+        EnrichedTrainMetadataDto train = trainMetadataAdapter.adapt(Optional.of(trainDepartureDto.train()));
         List<String> direction = getDirection(trainDepartureDto.mainStations(), errors);
         Duration stopDuration = getStopDuration(trainDepartureDto.stopDuration(), errors);
         LocalDateTime stopStartsAt = getStopStartsAt(date, trainDepartureDto.stopDuration(), errors);

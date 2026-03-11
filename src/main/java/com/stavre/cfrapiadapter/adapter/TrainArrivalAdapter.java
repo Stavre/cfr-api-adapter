@@ -1,10 +1,8 @@
 package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.train.TrainArrivalDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 
 import java.time.Duration;
@@ -18,7 +16,7 @@ import java.util.Optional;
 
 public class TrainArrivalAdapter {
 
-    private final TrainAdapter trainAdapter = new TrainAdapter();
+    private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
     private final AdapterUtils utils = new AdapterUtils();
 
     public EnrichedTrainArrivalDto adapt(Optional<TrainArrivalDto> trainArrivalDtoOpt, String date) {
@@ -35,7 +33,7 @@ public class TrainArrivalAdapter {
         String platform = utils.getTrainPlatform(trainArrivalDto.platform(), errors);
         String destination = getOrigin(trainArrivalDto.originStation(), errors);
 
-        EnrichedTrainDto train = trainAdapter.adapt(Optional.of(trainArrivalDto.train()));
+        EnrichedTrainMetadataDto train = trainMetadataAdapter.adapt(Optional.of(trainArrivalDto.train()));
         List<String> direction = getDirection(trainArrivalDto.mainStations(), errors);
         Duration stopDuration = getStopDuration(trainArrivalDto.stopDuration(), errors);
         LocalDateTime stopStartsAt = getStopEndsAt(date, trainArrivalDto.stopDuration(), errors);
@@ -48,8 +46,8 @@ public class TrainArrivalAdapter {
         if (duration.contains("necunoscută")) {
             return null;
         }
-        System.out.println("---------------");
-        System.out.println(duration);
+
+
         String extractedTime = duration.replace(")", "").split("la")[1].trim();
         Optional<LocalDate> dateOpt = utils.convertDate(date);
         Optional<LocalTime> timeOpt = utils.convertTime(extractedTime);

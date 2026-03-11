@@ -34,8 +34,8 @@ public class StationController {
         return service.getArrivals(stationName, _date);
     }
 
-    @GetMapping("/stations")
-    public List<String> getAllStations() {
-        return service.getAllStations(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-    }
+//    @GetMapping("/stations")
+//    public List<String> getAllStations() {
+//        return service.getAllStations(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+//    }
 }

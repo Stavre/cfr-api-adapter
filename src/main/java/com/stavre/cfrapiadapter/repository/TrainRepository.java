@@ -1,5 +1,6 @@
 package com.stavre.cfrapiadapter.repository;
 
+import com.stavre.cfrapiadapter.dto.train.TrainDto;
 import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
 import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
 import com.stavre.cfrapiadapter.proxy.TrainTimeTableProxy;
@@ -19,12 +20,12 @@ public class TrainRepository {
     private final TrainScraper scraper = new TrainScraper();
     private final TrainPageValidator validator = new TrainPageValidator();
 
-    public List<Optional<TrainStopDto>> getTrainStops(String trainId, String date) {
+    public TrainDto getTrainStops(String trainId, String date) {
         String tokenPage = proxy.getTrainTimeTable(trainId, date);
         RequestTrainTimeTableDto request = scraper.scrapeRequestTrainTimeTableDetails(tokenPage);
         String trainStopsPage = proxy.getTrainTimeTablePost(request);
         validator.validate(trainStopsPage, trainId, date);
 
-        return scraper.scrapeTrainTimeTable(trainStopsPage);
+        return scraper.scrapeTrain(trainStopsPage);
     }
 }

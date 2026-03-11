@@ -9,7 +9,7 @@ public record EnrichedTrainDepartureDto(
         Duration departureDelay,
         String platform,
         String destination,
-        EnrichedTrainDto train,
+        EnrichedTrainMetadataDto train,
         List<String> direction,
         Duration stopDuration,
         LocalDateTime stopStartsAt,

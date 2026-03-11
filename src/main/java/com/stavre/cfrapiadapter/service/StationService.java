@@ -37,30 +37,30 @@ public class StationService {
                 .toList();
     }
 
-    public List<String> getAllStations(String date) {
-        List<String> stations = new ArrayList<>(1700);
-        List<String> trainNumbers = new ArrayList<>();
+//    public List<String> getAllStations(String date) {
+//        List<String> stations = new ArrayList<>(1700);
+//        List<String> trainNumbers = new ArrayList<>();
+//
+//        helper("Bucuresti-Nord", date, stations, trainNumbers);
+//        return stations;
+//    }
 
-        helper("Bucuresti-Nord", date, stations, trainNumbers);
-        return stations;
-    }
-
-    private void helper(String stationName, String date, List<String> stations, List<String> trains) {
-        System.out.println("stationName: %s".formatted(stationName));
-        List<String> trainNumbers = helperTrains(stationName, date);
-        List<String> unvisitedTrainNumbers = findMissing(trainNumbers, trains);
-
-        trains.addAll(unvisitedTrainNumbers);
-
-        for (String trainNumber : unvisitedTrainNumbers) {
-            System.out.println("trainNumber: %s".formatted(trainNumber));
-            List<String> trainStations = helperStations(trainNumber, date);
-            List<String> unvisitedStations = findMissing(trainStations, stations);
-
-            stations.addAll(unvisitedStations);
-            unvisitedStations.forEach(station -> helper(station, date, stations, trains));
-        }
-    }
+//    private void helper(String stationName, String date, List<String> stations, List<String> trains) {
+//        System.out.println("stationName: %s".formatted(stationName));
+//        List<String> trainNumbers = helperTrains(stationName, date);
+//        List<String> unvisitedTrainNumbers = findMissing(trainNumbers, trains);
+//
+//        trains.addAll(unvisitedTrainNumbers);
+//
+//        for (String trainNumber : unvisitedTrainNumbers) {
+//            System.out.println("trainNumber: %s".formatted(trainNumber));
+//            List<String> trainStations = helperStations(trainNumber, date);
+//            List<String> unvisitedStations = findMissing(trainStations, stations);
+//
+//            stations.addAll(unvisitedStations);
+//            unvisitedStations.forEach(station -> helper(station, date, stations, trains));
+//        }
+//    }
 
     private List<String> helperTrains(String stationName, String date) {
         return repository.getDepartures(stationName, date).stream()
@@ -68,13 +68,13 @@ public class StationService {
                 .toList();
     }
 
-    private List<String> helperStations(String trainNumber, String date) {
-        return trainService.getTrainStops(trainNumber, date).stream()
-                .filter(s -> s.isPresent())
-                .map(s -> s.get())
-                .map(TrainStopDto::stationName)
-                .toList();
-    }
+//    private List<String> helperStations(String trainNumber, String date) {
+//        return trainService.getTrainStops(trainNumber, date).stream()
+//                .filter(s -> s.isPresent())
+//                .map(s -> s.get())
+//                .map(TrainStopDto::stationName)
+//                .toList();
+//    }
 
     private List<String> findMissing(List<String> candidate, List<String> all) {
         List<String> missingStations = new ArrayList<>();

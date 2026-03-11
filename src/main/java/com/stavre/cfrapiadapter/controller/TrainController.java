@@ -1,7 +1,9 @@
 package com.stavre.cfrapiadapter.controller;
 
+import com.stavre.cfrapiadapter.adapter.TrainDelayResponseAdapter;
 import com.stavre.cfrapiadapter.adapter.TrainStopAdapter;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
+import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
 import com.stavre.cfrapiadapter.service.TrainService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,26 +13,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
 public class TrainController {
 
     private final TrainService service;
-    private final TrainStopAdapter adapter = new TrainStopAdapter();
+    private final TrainDelayResponseAdapter delayResponseAdapter = new TrainDelayResponseAdapter();
 
     @GetMapping("/train/{trainId}")
-    public List<EnrichedTrainStopDto> getTrainTimeTable(@PathVariable String trainId, @RequestParam(required = false) String date) {
+    public EnrichedTrainDto getTrainTimeTable(@PathVariable String trainId,
+                                              @RequestParam(required = false) String date) {
         String _date = date == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : date;
 
-        return service.getTrainStops(trainId, _date).stream()
-                .map(s -> adapter.adapt(s, _date))
-                .toList();
+        return service.getTrainStops(trainId, _date);
     }
 
-    @GetMapping("/trains")
-    public List<String> getAllTrainNumbers() {
-        return service.getAllTrains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+    @GetMapping("/train/{trainId}/delay")
+    public TrainDelayResponseDto getTrainDelay(@PathVariable String trainId,
+                                               @RequestParam(required = false) String date,
+                                               @RequestParam(required = false) String station) {
+        String _date = date == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : date;
+
+        EnrichedTrainDto trainDto = service.getTrainStops(trainId, _date);
+        if (station == null) {
+            return delayResponseAdapter.adapt(trainDto, _date);
+        }
+
+        return delayResponseAdapter.adapt(trainDto, _date, station);
     }
+//
+//    @GetMapping("/trains")
+//    public List<String> getAllTrainNumbers() {
+//        return service.getAllTrains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+//    }
 }
