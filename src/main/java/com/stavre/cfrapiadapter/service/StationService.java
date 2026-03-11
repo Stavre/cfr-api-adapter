@@ -1,6 +1,8 @@
 package com.stavre.cfrapiadapter.service;
 
+import com.stavre.cfrapiadapter.adapter.TrainArrivalAdapter;
 import com.stavre.cfrapiadapter.adapter.TrainDepartureAdapter;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
 import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
@@ -18,13 +20,20 @@ public class StationService {
 
     private final StationRepository repository;
     private final TrainService trainService;
-    private final TrainDepartureAdapter adapter = new TrainDepartureAdapter();
+    private final TrainDepartureAdapter departureAdapter = new TrainDepartureAdapter();
+    private final TrainArrivalAdapter arrivalAdapter = new TrainArrivalAdapter();
 
     private final List<String> startStations = List.of("Bucuresti-Nord", "Constanța", "Craiova", "Arad", "Iași", "Brașov");
 
     public List<EnrichedTrainDepartureDto> getDepartures(String stationName, String date) {
         return repository.getDepartures(stationName, date).stream()
-                .map(departure -> adapter.adapt(departure, date))
+                .map(departure -> departureAdapter.adapt(departure, date))
+                .toList();
+    }
+
+    public List<EnrichedTrainArrivalDto> getArrivals(String stationName, String date) {
+        return repository.getArrivals(stationName, date).stream()
+                .map(departure -> arrivalAdapter.adapt(departure, date))
                 .toList();
     }
 

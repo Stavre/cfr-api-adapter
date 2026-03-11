@@ -2,6 +2,7 @@ package com.stavre.cfrapiadapter.scraper;
 
 import com.stavre.cfrapiadapter.dto.request.RequestDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
+import com.stavre.cfrapiadapter.dto.train.TrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.train.TrainDto;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-public class StationScraper {
+public class StationArrivalsScraper {
     private final VerificationTokensScraper verificationTokensScraper = new VerificationTokensScraper();
 
     public RequestStationTrainsDto scrapeRequestStationTrainsDetails(String htmlPage) {
@@ -25,40 +26,40 @@ public class StationScraper {
         return new RequestStationTrainsDto(date, trainRunningNumber, verificationTokensDto);
     }
 
-    public List<Optional<TrainDepartureDto>> scrapeStationDepartures(String htmlPage) {
+    public List<Optional<TrainArrivalDto>> scrapeStationArrivals(String htmlPage) {
         Element body = Jsoup.parse(htmlPage).body();
-        var departuresTable = getDeparturesTable(body);
-        return extractDeparturesFromTable(departuresTable);
+        var departuresTable = getArrivalsTable(body);
+        return extractArrivalsFromTable(departuresTable);
     }
 
-    private Element getDeparturesTable(Element htmlPage) {
-        return htmlPage.getElementsByAttributeValue("class", "list-group").getFirst();
+    private Element getArrivalsTable(Element htmlPage) {
+        return htmlPage.getElementsByAttributeValue("class", "list-group").getLast();
     }
 
-    private List<Optional<TrainDepartureDto>> extractDeparturesFromTable(Element table) {
-        return getDepartureTableRows(table).stream()
-                .map(this::extractDeparture)
+    private List<Optional<TrainArrivalDto>> extractArrivalsFromTable(Element table) {
+        return getArrivalTableRows(table).stream()
+                .map(this::extractArrival)
                 .toList();
     }
 
-    private Elements getDepartureTableRows(Element table) {
+    private Elements getArrivalTableRows(Element table) {
         return table.select("ul.list-group > li.list-group-item");
     }
 
-    private Optional<TrainDepartureDto> extractDeparture(Element row) {
+    private Optional<TrainArrivalDto> extractArrival(Element row) {
         try {
-            String departureTime = getDepartureTime(row);
+            String departureTime = getArrivalTime(row);
             String departureTimeLabel = getDelayLabel(row);
             String platform = getPlatform(row);
 
-            String destinationName = getDestinationName(row);
+            String destinationName = getOriginName(row);
 
             TrainDto train = getTrain(row);
             String mainStations = getMainStations(row);
             String stopDuration = getStopDuration(row);
 
             return Optional.of(
-                    new TrainDepartureDto(
+                    new TrainArrivalDto(
                             departureTime, departureTimeLabel,
                             platform, destinationName,
                             train, mainStations, stopDuration)
@@ -77,7 +78,7 @@ public class StationScraper {
         }
     }
 
-    private String getDepartureTime(Element row) {
+    private String getArrivalTime(Element row) {
         try {
             Element depTimeEl = row.selectFirst(".col-md-2 .line-height-1-25 > div:nth-of-type(2)");
             return depTimeEl.text().trim();
@@ -87,19 +88,10 @@ public class StationScraper {
 
     }
 
-    private String getDestinationName(Element row) {
+    private String getOriginName(Element row) {
         try {
             Element destA = row.selectFirst(".col-md-3 a");
             return destA.text().trim();
-        } catch (NullPointerException e) {
-            return "";
-        }
-    }
-
-    private String getDestinationHref(Element row) {
-        try {
-            Element destA = row.selectFirst(".col-md-3 a");
-            return destA.attr("href").trim();
         } catch (NullPointerException e) {
             return "";
         }
