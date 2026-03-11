@@ -1,7 +1,6 @@
 package com.stavre.cfrapiadapter.controller;
 
 import com.stavre.cfrapiadapter.adapter.TrainDelayResponseAdapter;
-import com.stavre.cfrapiadapter.adapter.TrainStopAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
 import com.stavre.cfrapiadapter.service.TrainService;
