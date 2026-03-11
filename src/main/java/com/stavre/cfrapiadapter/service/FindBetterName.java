@@ -1,6 +1,6 @@
 package com.stavre.cfrapiadapter.service;
 
-import com.stavre.cfrapiadapter.dto.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
@@ -45,12 +45,14 @@ public class FindBetterName {
 
     private List<String> helperTrains(String stationName, String date) {
         return stationService.getDepartures(stationName, date).stream()
-                .map(departure -> departure.train().trainNumber())
+                .map(departure -> departure.train().id())
                 .toList();
     }
 
     private List<String> helperStations(String trainNumber, String date) {
         return trainService.getTrainStops(trainNumber, date).stream()
+                .filter(s -> s.isPresent())
+                .map(s -> s.get())
                 .map(TrainStopDto::stationName)
                 .toList();
     }

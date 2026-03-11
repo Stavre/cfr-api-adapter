@@ -1,35 +1,25 @@
 package com.stavre.cfrapiadapter.service;
 
-import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
-import com.stavre.cfrapiadapter.dto.TrainStopDto;
-import com.stavre.cfrapiadapter.proxy.TrainTimeTableProxy;
+import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
 import com.stavre.cfrapiadapter.repository.StationRepository;
-import com.stavre.cfrapiadapter.scraper.TrainTimeTableScraper;
+import com.stavre.cfrapiadapter.repository.TrainRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class TrainService {
 
     private final StationRepository repository;
+    private final TrainRepository trainRepository;
 
-    private final TrainTimeTableProxy proxy;
-    private final TrainTimeTableScraper scraper = new TrainTimeTableScraper();
 
-    public List<TrainStopDto> getTrainStops(String trainId, String date) {
-        String tokenPage = proxy.getTrainTimeTable(trainId, date);
-        RequestTrainTimeTableDto request = scraper.scrapeRequestTrainTimeTableDetails(tokenPage);
-        String trainStopsPage = proxy.getTrainTimeTablePost(request);
-
-        if (trainStopsPage.contains("nu circulă în data de")) {
-            return List.of();
-        }
-
-        return scraper.scrapeTrainTimeTable(trainStopsPage);
+    public List<Optional<TrainStopDto>> getTrainStops(String trainId, String date) {
+        return trainRepository.getTrainStops(trainId, date);
     }
 
 
@@ -60,12 +50,14 @@ public class TrainService {
 
     private List<String> helperTrains(String stationName, String date) {
         return repository.getDepartures(stationName, date).stream()
-                .map(departure -> departure.train().trainNumber())
+                .map(departure -> departure.get().train().trainNumber())
                 .toList();
     }
 
     private List<String> helperStations(String trainNumber, String date) {
         return getTrainStops(trainNumber, date).stream()
+                .filter(s -> s.isPresent())
+                .map(s -> s.get())
                 .map(TrainStopDto::stationName)
                 .toList();
     }

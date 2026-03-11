@@ -1,17 +1,19 @@
 package com.stavre.cfrapiadapter.scraper;
 
-import com.stavre.cfrapiadapter.dto.*;
 import com.stavre.cfrapiadapter.dto.request.RequestDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
+import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.train.TrainDto;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
-public class StationTrainsScraper {
+public class StationScraper {
     private final VerificationTokensScraper verificationTokensScraper = new VerificationTokensScraper();
 
     public RequestStationTrainsDto scrapeRequestStationTrainsDetails(String htmlPage) {
@@ -23,13 +25,17 @@ public class StationTrainsScraper {
         return new RequestStationTrainsDto(date, trainRunningNumber, verificationTokensDto);
     }
 
-    public List<StationTrainDepartureDto> scrapeStationDepartures(String htmlPage) {
+    public List<Optional<TrainDepartureDto>> scrapeStationDepartures(String htmlPage) {
         Element body = Jsoup.parse(htmlPage).body();
-        var departuresTable = body.getElementsByAttributeValue("class", "list-group").getFirst();
+        var departuresTable = getDeparturesTable(body);
         return extractDeparturesFromTable(departuresTable);
     }
 
-    private List<StationTrainDepartureDto> extractDeparturesFromTable(Element table) {
+    private Element getDeparturesTable(Element htmlPage) {
+        return htmlPage.getElementsByAttributeValue("class", "list-group").getFirst();
+    }
+
+    private List<Optional<TrainDepartureDto>> extractDeparturesFromTable(Element table) {
         return getDepartureTableRows(table).stream()
                 .map(this::extractDeparture)
                 .toList();
@@ -39,22 +45,35 @@ public class StationTrainsScraper {
         return table.select("ul.list-group > li.list-group-item");
     }
 
-    private StationTrainDepartureDto extractDeparture(Element row) {
+    private Optional<TrainDepartureDto> extractDeparture(Element row) {
         try {
             String departureTime = getDepartureTime(row);
-            String destinationName = getDestinationName(row);
-            String destinationHref = getDestinationHref(row);
-
-            TrainDto train = getTrain(row);
-
-            String stopDuration = getStopDuration(row);
-            String delayLabel = getDelayLabel(row);
+            String departureTimeLabel = getDelayLabel(row);
             String platform = getPlatform(row);
 
-            return new StationTrainDepartureDto(departureTime, destinationName, destinationHref, train, stopDuration, delayLabel, platform);
+            String destinationName = getDestinationName(row);
+
+            TrainDto train = getTrain(row);
+            String mainStations = getMainStations(row);
+            String stopDuration = getStopDuration(row);
+
+            return Optional.of(
+                    new TrainDepartureDto(
+                            departureTime, departureTimeLabel,
+                            platform, destinationName,
+                            train, mainStations, stopDuration)
+            );
 
         } catch (RuntimeException e) {
-            throw new RuntimeException("Could not process row.", e);
+            return Optional.empty();
+        }
+    }
+
+    private String getMainStations(Element row) {
+        try {
+            return row.child(0).child(1).child(0).child(1).child(0).child(1).text();
+        } catch (Exception e) {
+            return "";
         }
     }
 
@@ -70,8 +89,8 @@ public class StationTrainsScraper {
 
     private String getDestinationName(Element row) {
         try {
-        Element destA = row.selectFirst(".col-md-3 a");
-        return destA.text().trim();
+            Element destA = row.selectFirst(".col-md-3 a");
+            return destA.text().trim();
         } catch (NullPointerException e) {
             return "";
         }
@@ -79,11 +98,11 @@ public class StationTrainsScraper {
 
     private String getDestinationHref(Element row) {
         try {
-        Element destA = row.selectFirst(".col-md-3 a");
-        return destA.attr("href").trim();
-    } catch (NullPointerException e) {
-        return "";
-    }
+            Element destA = row.selectFirst(".col-md-3 a");
+            return destA.attr("href").trim();
+        } catch (NullPointerException e) {
+            return "";
+        }
     }
 
     private TrainDto getTrain(Element row) {
@@ -97,10 +116,10 @@ public class StationTrainsScraper {
         trainCategory = catSpan == null ? "" : catSpan.text().trim();
 
         Element trainA = trainBlock.selectFirst("a[href*=/Tren/]");
-        trainNumber = trainA  == null ? "" : trainA.text().trim();
+        trainNumber = trainA == null ? "" : trainA.text().trim();
 
         Element opImg = row.selectFirst("img.img-train-operator");
-        operator = opImg  == null ? "" : opImg.attr("alt").trim();
+        operator = opImg == null ? "" : opImg.attr("alt").trim();
 
         return new TrainDto(trainNumber, trainCategory, operator);
     }
@@ -128,21 +147,21 @@ public class StationTrainsScraper {
 
     private String getDelayLabel(Element row) {
         try {
-        Element badge = row.selectFirst(".div-stations-train-real-time-badge");
-        Element firstInline = badge.selectFirst("div.d-inline-block, div.color-firebrick, div.color-gray");
-        return firstInline.text().trim();
-    } catch (NullPointerException e) {
-        return "";
+            Element badge = row.selectFirst(".div-stations-train-real-time-badge");
+            Element firstInline = badge.selectFirst("div.d-inline-block, div.color-firebrick, div.color-gray");
+            return firstInline.text().trim();
+        } catch (NullPointerException e) {
+            return "";
         }
     }
 
     private String getPlatform(Element row) {
-    try {
-        Element badge = row.selectFirst(".div-stations-train-real-time-badge");
-        Element platformEl = badge.selectFirst("div.d-inline-block.ml-3, div.ml-3");
-        return platformEl.text().trim();
-    } catch (NullPointerException e) {
-        return "";
+        try {
+            Element badge = row.selectFirst(".div-stations-train-real-time-badge");
+            Element platformEl = badge.selectFirst("div.d-inline-block.ml-3, div.ml-3");
+            return platformEl.text().trim();
+        } catch (NullPointerException e) {
+            return "";
         }
     }
 }

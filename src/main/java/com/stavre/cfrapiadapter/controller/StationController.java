@@ -1,6 +1,7 @@
 package com.stavre.cfrapiadapter.controller;
 
-import com.stavre.cfrapiadapter.dto.StationTrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.service.StationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @RequiredArgsConstructor
@@ -20,13 +22,13 @@ public class StationController {
     private final StationService service;
 
     @GetMapping("/station/{stationName}")
-    public List<StationTrainDepartureDto> getTrainTimeTable(@PathVariable String stationName, @RequestParam(required = false) String date) {
+    public List<EnrichedTrainDepartureDto> getTrainTimeTable(@PathVariable String stationName, @RequestParam(required = false) String date) {
         String _date = date == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : date;
         return service.getDepartures(stationName, _date);
     }
 
     @GetMapping("/stations")
-    public List<String> getAllStations() throws ExecutionException, InterruptedException {
+    public List<String> getAllStations() {
         return service.getAllStations(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
     }
 }

@@ -1,13 +1,16 @@
 package com.stavre.cfrapiadapter.service;
 
-import com.stavre.cfrapiadapter.dto.TrainStopDto;
-import com.stavre.cfrapiadapter.dto.StationTrainDepartureDto;
+import com.stavre.cfrapiadapter.adapter.TrainDepartureAdapter;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -15,11 +18,14 @@ public class StationService {
 
     private final StationRepository repository;
     private final TrainService trainService;
+    private final TrainDepartureAdapter adapter = new TrainDepartureAdapter();
 
     private final List<String> startStations = List.of("Bucuresti-Nord", "Constanța", "Craiova", "Arad", "Iași", "Brașov");
 
-    public List<StationTrainDepartureDto> getDepartures(String stationName, String date) {
-        return repository.getDepartures(stationName, date);
+    public List<EnrichedTrainDepartureDto> getDepartures(String stationName, String date) {
+        return repository.getDepartures(stationName, date).stream()
+                .map(departure -> adapter.adapt(departure, date))
+                .toList();
     }
 
     public List<String> getAllStations(String date) {
@@ -49,12 +55,14 @@ public class StationService {
 
     private List<String> helperTrains(String stationName, String date) {
         return repository.getDepartures(stationName, date).stream()
-                .map(departure -> departure.train().trainNumber())
+                .map(departure -> departure.get().train().trainNumber())
                 .toList();
     }
 
     private List<String> helperStations(String trainNumber, String date) {
         return trainService.getTrainStops(trainNumber, date).stream()
+                .filter(s -> s.isPresent())
+                .map(s -> s.get())
                 .map(TrainStopDto::stationName)
                 .toList();
     }
