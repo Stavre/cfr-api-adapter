@@ -11,7 +11,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class TrainScraper {
@@ -33,8 +35,8 @@ public class TrainScraper {
 
     public TrainDto scrapeTrain(String html) {
         Optional<TrainMetadataDto> metadataDto = scrapeTrainMetadata(html);
-        List<Optional<TrainStopDto>> stops = scrapeTrainTimeTable(html);
-        return new TrainDto(metadataDto, stops);
+        Map<String, List<Optional<TrainStopDto>>> branchStops = scrapeTrainBranches(html);
+        return new TrainDto(metadataDto, branchStops);
     }
 
     public Optional<TrainMetadataDto> scrapeTrainMetadata(String htmlPage) {
@@ -52,15 +54,40 @@ public class TrainScraper {
         }
     }
 
-    public List<Optional<TrainStopDto>> scrapeTrainTimeTable(String htmlPage) {
-        Element body = Jsoup.parse(htmlPage).body();
-        var timeTable = getTimeTable(body);
-        scrapeTrainMetadata(htmlPage);
+    public Map<String, List<Optional<TrainStopDto>>> scrapeTrainBranches(String html) {
+        Element body = Jsoup.parse(html).body();
+
+        Elements timeTables = getTimeTable(body);
+        if (timeTables.size() == 1) {
+            return Map.of("Main train", scrapeTrainTimeTable(timeTables.getFirst()));
+        }
+
+        Map<String, List<Optional<TrainStopDto>>> res = new HashMap<>();
+
+        List<String> branches = getBranches(html);
+        for (int i = 0; i < timeTables.size(); i++) {
+            res.put(branches.get(i), extractTrainStopsFromTimeTable(timeTables.get(i)));
+        }
+
+        return res;
+
+    }
+
+    public List<String> getBranches(String html) {
+        Element body = Jsoup.parse(html).body();
+        Elements e = body.getElementsByClass("jumbotron p-3 mb-3").getFirst().child(1).getElementsByClass("m-1 flex-grow-1");//.child(0);
+        return e.stream().map(el -> el.text()).toList();
+    }
+
+    public List<Optional<TrainStopDto>> scrapeTrainTimeTable(Element timeTable) {
+//        Element body = Jsoup.parse(htmlPage).body();
+//        var timeTable = getTimeTable(body);
+//        scrapeTrainMetadata(htmlPage);
         return extractTrainStopsFromTimeTable(timeTable);
     }
 
-    private Element getTimeTable(Element page) {
-        return page.getElementsByAttributeValue("class", "list-group").getFirst();
+    private Elements getTimeTable(Element page) {
+        return page.getElementsByAttributeValue("class", "list-group");
     }
 
     private List<Optional<TrainStopDto>> extractTrainStopsFromTimeTable(Element html) {
@@ -159,8 +186,8 @@ public class TrainScraper {
     }
 
     private String getPlatform(Element innerRow) {
-        System.out.println("---------------------");
-        System.out.println(innerRow);
+//        System.out.println("---------------------");
+//        System.out.println(innerRow);
         Elements allCols = innerRow.select(".col-md-2, .col-md-3, .col-md-5");
         for (Element c : allCols) {
             String t = c.text().trim();

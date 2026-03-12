@@ -1,9 +1,12 @@
 package com.stavre.cfrapiadapter.dto.enriched;
 
+import lombok.With;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@With
 public record EnrichedTrainStopDto(
         LocalDateTime arrival,
         Duration arrivalDelay,
