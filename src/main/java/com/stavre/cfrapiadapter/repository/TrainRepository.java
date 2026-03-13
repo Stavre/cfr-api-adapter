@@ -16,13 +16,15 @@ public class TrainRepository {
     private final TrainTimeTableProxy proxy;
     private final TrainScraper scraper;
     private final TrainRequestScraper requestScraper;
-    private final TrainPageValidator validator = new TrainPageValidator();
+    private final TrainPageValidator validator;
 
     public TrainDto getTrainStops(String trainId, String date) {
-        String tokenPage = proxy.getTrainTimeTable(trainId, date);
+        String tokenPage = proxy.getTrainTokenPage(trainId, date);
+        validator.validate(tokenPage);
+
         RequestTrainTimeTableDto request = requestScraper.scrapeRequestDetails(tokenPage);
-        String trainStopsPage = proxy.getTrainTimeTablePost(request);
-        validator.validate(trainStopsPage, trainId, date);
+
+        String trainStopsPage = proxy.getTrainTimeTable(request);
 
         return scraper.scrapeTrain(trainStopsPage);
     }

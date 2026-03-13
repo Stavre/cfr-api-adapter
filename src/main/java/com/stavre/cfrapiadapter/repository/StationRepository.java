@@ -22,10 +22,10 @@ public class StationRepository {
 
     public List<Optional<StationTrainDto>> getDepartures(String stationName, String date) {
         try {
-            String response = proxy.getStationTrains(stationName, date);
+            String response = proxy.getStationTokenPage(stationName, date);
             RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
-            String secondResult = proxy.getStationTrainsPost(request);
 
+            String secondResult = proxy.getStationTrains(request);
             return stationScraper.scrapeDepartures(secondResult);
         } catch (RuntimeException e) {
             log.error("Could not extract departures for station %s, date %s".formatted(stationName, date));
@@ -35,9 +35,10 @@ public class StationRepository {
 
     public List<Optional<StationTrainDto>> getArrivals(String stationName, String date) {
         try {
-            String response = proxy.getStationTrains(stationName, date);
+            String response = proxy.getStationTokenPage(stationName, date);
             RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
-            String secondResult = proxy.getStationTrainsPost(request);
+
+            String secondResult = proxy.getStationTrains(request);
 
             return stationScraper.scrapeArrivals(secondResult);
         } catch (RuntimeException e) {

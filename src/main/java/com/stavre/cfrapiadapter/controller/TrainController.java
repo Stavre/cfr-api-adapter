@@ -2,8 +2,12 @@ package com.stavre.cfrapiadapter.controller;
 
 import com.stavre.cfrapiadapter.adapter.TrainDelayResponseAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
+import com.stavre.cfrapiadapter.dto.request.metadata.RequestTrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.request.metadata.RequestTrainMetadataFactory;
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
+import com.stavre.cfrapiadapter.dto.response.TrainResponseDto;
 import com.stavre.cfrapiadapter.service.TrainService;
+import com.stavre.cfrapiadapter.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,15 +21,18 @@ import java.time.format.DateTimeFormatter;
 @RestController
 public class TrainController {
 
+    private final RequestTrainMetadataFactory requestTrainMetadataFactory;
+
     private final TrainService service;
     private final TrainDelayResponseAdapter delayResponseAdapter = new TrainDelayResponseAdapter();
 
-    @GetMapping("/train/{trainId}")
-    public EnrichedTrainDto getTrainTimeTable(@PathVariable String trainId,
+    @GetMapping("/train/{trainNumber}")
+    public TrainResponseDto getTrainTimeTable(@PathVariable String trainNumber,
                                               @RequestParam(required = false) String date) {
-        String _date = date == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : date;
 
-        return service.getTrainStops(trainId, _date);
+        RequestTrainMetadataDto requestMetadata = requestTrainMetadataFactory.create(date, trainNumber);
+        EnrichedTrainDto train = service.getTrainStops(trainNumber, date);
+        return new TrainResponseDto(requestMetadata, train);
     }
 
     @GetMapping("/train/{trainId}/delay")

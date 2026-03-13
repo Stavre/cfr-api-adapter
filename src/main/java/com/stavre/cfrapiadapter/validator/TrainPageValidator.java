@@ -1,35 +1,47 @@
 package com.stavre.cfrapiadapter.validator;
 
-import com.stavre.cfrapiadapter.exception.train.InvalidDateException;
-import com.stavre.cfrapiadapter.exception.train.TrainNotFoundException;
-import com.stavre.cfrapiadapter.exception.train.TrainNotPresentOnDateException;
+import com.stavre.cfrapiadapter.exception.CFRException;
+import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.jsoup.nodes.Element;
+import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+@RequiredArgsConstructor
+@Component
 public class TrainPageValidator {
 
-    public void validate(@NonNull String htmlPage, String trainNumber, String date) {
-        if (trainMissing(htmlPage)) {
-            throw new TrainNotFoundException(trainNumber);
+    private final ScraperUtils scraperUtils;
+    public void validate(@NonNull String htmlPage) {
+        Element pageBody = scraperUtils.scrapePageBody(htmlPage);
+
+        pageBody.select("script").remove();
+
+        List<String> errors = pageBody
+                .getElementsByClass("text-danger")
+                .stream()
+                .map(Element::text)
+                .filter(error -> error != null && !error.isBlank())
+                .toList();
+
+        if (errors.isEmpty()) {
+            return;
         }
 
-        if (trainMissingOnDate(htmlPage)) {
-            throw new TrainNotPresentOnDateException(trainNumber, date);
-        }
-
-        if (requestOutsideOfTimeInterval(htmlPage)) {
-            throw new InvalidDateException(30);
-        }
+        throw new CFRException(errors);
     }
 
-    private boolean trainMissing(String htmlPage) {
-        return htmlPage.contains("Nu a fost găsit niciun tren cu acest număr!");
+    private boolean trainMissing(Element pageBody) {
+        return pageBody.html().contains("Nu a fost găsit niciun tren cu acest număr!");
     }
 
-    private boolean trainMissingOnDate(String htmlPage) {
-        return htmlPage.contains("nu circulă în data de");
+    private boolean trainMissingOnDate(Element pageBody) {
+        return pageBody.html().contains("nu circulă în data de");
     }
 
-    private boolean requestOutsideOfTimeInterval(String htmlPage) {
-        return htmlPage.contains("Data nu se află în intervalul de 30 de zile!");
+    private boolean requestOutsideOfTimeInterval(Element pageBody) {
+        return pageBody.html().contains("Data nu se află în intervalul de 30 de zile!");
     }
 }

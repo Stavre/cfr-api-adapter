@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 public interface TrainStationProxy {
 
     @GetMapping(value="/ro-RO/Statie/{stationName}", produces = MediaType.TEXT_HTML_VALUE)
-    String getStationTrains(@PathVariable String stationName, @RequestParam(name = "Date") String date);
+    String getStationTokenPage(@PathVariable String stationName, @RequestParam(name = "Date") String date);
 
     @PostMapping(value = "/ro-RO/Stations/StationsResult", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    String getStationTrainsPost(@RequestBody RequestStationTrainsDto requestDetails);
+    String getStationTrains(@RequestBody RequestStationTrainsDto requestDetails);
 }

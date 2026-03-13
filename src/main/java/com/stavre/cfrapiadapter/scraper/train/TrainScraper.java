@@ -1,5 +1,6 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
+import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
@@ -27,14 +28,14 @@ public class TrainScraper {
     public TrainDto scrapeTrain(String html) {
         Element pageBody = utils.scrapePageBody(html);
         Optional<TrainMetadataDto> metadataDto = trainMetadataScraper.scrapeMetadata(pageBody);
-        Map<String, List<Optional<TrainStopDto>>> branchStops = scrapeTrainBranches(pageBody);
+        Map<TrainBranchDto, List<Optional<TrainStopDto>>> branchStops = scrapeTrainBranches(pageBody);
         return new TrainDto(metadataDto, branchStops);
     }
 
-    public Map<String, List<Optional<TrainStopDto>>> scrapeTrainBranches(Element pageBody) {
+    public Map<TrainBranchDto, List<Optional<TrainStopDto>>> scrapeTrainBranches(Element pageBody) {
 
         Elements timeTables = trainBranchScraper.scrapeTrainTimeTables(pageBody);
-        List<String> branches = trainBranchScraper.scrapeBranches(pageBody);
+        List<TrainBranchDto> branches = trainBranchScraper.scrapeBranches(pageBody);
         List<List<Optional<TrainStopDto>>> stops = timeTables.stream()
                 .map(trainStopsScraper::scrapeTrainStops)
                 .toList();

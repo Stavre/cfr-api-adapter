@@ -4,18 +4,19 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record EnrichedTrainDepartureDto(
-        LocalDateTime departure,
-        Duration departureDelay,
+public record EnrichedStationTrainDto(
+        StationTrainType type,
+        LocalDateTime time,
+        Duration delay,
         String platform,
-        String destination,
+        String secondStation,
         EnrichedTrainMetadataDto train,
         List<String> direction,
         Duration stopDuration,
         LocalDateTime stopStartsAt,
         List<String> errors
 ) {
-    public EnrichedTrainDepartureDto(List<String> errors) {
-        this(null, null, null, null, null, null, null, null, errors);
+    public EnrichedStationTrainDto(StationTrainType type, List<String> errors) {
+        this(type, null, null, null, null, null, null, null, null, errors);
     }
 }

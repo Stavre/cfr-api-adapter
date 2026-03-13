@@ -2,6 +2,7 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 
@@ -21,7 +22,7 @@ public class TrainAdapter {
         );
     }
 
-    private Map<String, List<EnrichedTrainStopDto>> getStops(Map<String, List<Optional<TrainStopDto>>> stops, String date) {
+    private Map<TrainBranchDto, List<EnrichedTrainStopDto>> getStops(Map<TrainBranchDto, List<Optional<TrainStopDto>>> stops, String date) {
         return stops.entrySet().stream()
                 .map(e -> Map.entry(e.getKey(), getEnrichedStops(e.getValue(), date)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
