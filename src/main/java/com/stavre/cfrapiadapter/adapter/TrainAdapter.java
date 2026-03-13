@@ -2,13 +2,11 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDto;
-import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class TrainAdapter {

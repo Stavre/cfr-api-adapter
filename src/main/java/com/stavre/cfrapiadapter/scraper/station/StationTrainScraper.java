@@ -1,7 +1,7 @@
 package com.stavre.cfrapiadapter.scraper.station;
 
-import com.stavre.cfrapiadapter.dto.train.StationTrainDto;
-import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.scraper.StationTrainDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,12 +15,13 @@ import java.util.Optional;
 public class StationTrainScraper {
 //    TODO: Find a better name for this class
 
+    private final StationTrainMetadataScraper trainMetadataScraper;
+
     public List<Optional<StationTrainDto>> scrapeStationTrains(Element table) {
         return scrapeTableRows(table).stream()
                 .map(this::scrapeStationTrain)
                 .toList();
     }
-
 
     private Optional<StationTrainDto> scrapeStationTrain(Element row) {
         try {
@@ -29,7 +30,7 @@ public class StationTrainScraper {
             String departureTimeLabel = scrapeDelayLabel(row);
             String platform = scrapePlatform(row);
             String destinationName = scrapeStationName(row);
-            TrainMetadataDto train = scrapeTrainMetadata(row);
+            TrainMetadataDto train = trainMetadataScraper.scrapeTrainMetadata(row);
             String mainStations = scrapeMainStations(row);
             String stopDuration = scrapeStopDuration(row);
 
@@ -57,24 +58,7 @@ public class StationTrainScraper {
         }
     }
 
-    private TrainMetadataDto scrapeTrainMetadata(Element row) {
-        String trainCategory = "";
-        String trainNumber = "";
-        String operator = "";
 
-        Element trainBlock = row.select(".col-md-2 .line-height-1-25").get(1);
-
-        Element catSpan = trainBlock.selectFirst("span[class^=span-train-category]");
-        trainCategory = catSpan == null ? "" : catSpan.text().trim();
-
-        Element trainA = trainBlock.selectFirst("a[href*=/Tren/]");
-        trainNumber = trainA == null ? "" : trainA.text().trim();
-
-        Element opImg = row.selectFirst("img.img-train-operator");
-        operator = opImg == null ? "" : opImg.attr("alt").trim();
-
-        return new TrainMetadataDto(trainNumber, trainCategory, operator);
-    }
 
     private String scrapeStationName(Element row) {
         try {

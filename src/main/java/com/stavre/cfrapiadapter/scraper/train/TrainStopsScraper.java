@@ -1,6 +1,6 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
-import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;

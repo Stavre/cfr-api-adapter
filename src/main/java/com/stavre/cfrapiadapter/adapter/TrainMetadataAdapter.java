@@ -1,7 +1,7 @@
 package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 
 import java.util.ArrayList;
 import java.util.List;

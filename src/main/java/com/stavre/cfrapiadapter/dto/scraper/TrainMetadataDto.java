@@ -1,4 +1,4 @@
-package com.stavre.cfrapiadapter.dto.train;
+package com.stavre.cfrapiadapter.dto.scraper;
 
 public record TrainMetadataDto(
         String trainNumber,

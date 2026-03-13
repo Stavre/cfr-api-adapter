@@ -1,8 +1,8 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
-import com.stavre.cfrapiadapter.dto.train.TrainDto;
-import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;

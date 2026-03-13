@@ -2,7 +2,7 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.train.StationTrainDto;
+import com.stavre.cfrapiadapter.dto.scraper.StationTrainDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 
 import java.time.Duration;

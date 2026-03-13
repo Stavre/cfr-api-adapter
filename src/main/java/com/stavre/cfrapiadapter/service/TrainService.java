@@ -2,8 +2,7 @@ package com.stavre.cfrapiadapter.service;
 
 import com.stavre.cfrapiadapter.adapter.TrainAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDto;
-import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.repository.StationRepository;
 import com.stavre.cfrapiadapter.repository.TrainRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service

@@ -1,6 +1,6 @@
 package com.stavre.cfrapiadapter.repository;
 
-import com.stavre.cfrapiadapter.dto.train.StationTrainDto;
+import com.stavre.cfrapiadapter.dto.scraper.StationTrainDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
 import com.stavre.cfrapiadapter.proxy.TrainStationProxy;
 import com.stavre.cfrapiadapter.scraper.station.StationRequestScraper;

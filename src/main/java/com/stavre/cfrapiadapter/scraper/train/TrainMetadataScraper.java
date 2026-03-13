@@ -1,6 +1,6 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
-import com.stavre.cfrapiadapter.dto.train.TrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
