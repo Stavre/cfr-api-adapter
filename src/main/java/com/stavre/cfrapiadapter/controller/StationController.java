@@ -3,7 +3,6 @@ package com.stavre.cfrapiadapter.controller;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.response.StationDelayResponseDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.service.StationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

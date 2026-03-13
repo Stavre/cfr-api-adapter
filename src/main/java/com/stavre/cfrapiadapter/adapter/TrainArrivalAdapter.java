@@ -2,7 +2,7 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.train.TrainArrivalDto;
+import com.stavre.cfrapiadapter.dto.train.StationTrainDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 
 import java.time.Duration;
@@ -19,19 +19,19 @@ public class TrainArrivalAdapter {
     private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
     private final AdapterUtils utils = new AdapterUtils();
 
-    public EnrichedTrainArrivalDto adapt(Optional<TrainArrivalDto> trainArrivalDtoOpt, String date) {
+    public EnrichedTrainArrivalDto adapt(Optional<StationTrainDto> trainArrivalDtoOpt, String date) {
         if (trainArrivalDtoOpt.isEmpty()) {
             return new EnrichedTrainArrivalDto(List.of("Could not scrap train arrival from CFR page"));
         }
 
-        TrainArrivalDto trainArrivalDto = trainArrivalDtoOpt.get();
+        StationTrainDto trainArrivalDto = trainArrivalDtoOpt.get();
         List<String> errors = new ArrayList<>();
 
-        LocalDateTime departure = utils.getArrivalTimestamp(date, trainArrivalDto.arrivalTime(), errors);
-        Duration departureDelay = utils.getDelay(trainArrivalDto.arrivalTimeLabel(), errors);
+        LocalDateTime departure = utils.getArrivalTimestamp(date, trainArrivalDto.time(), errors);
+        Duration departureDelay = utils.getDelay(trainArrivalDto.timeLabel(), errors);
 
         String platform = utils.getTrainPlatform(trainArrivalDto.platform(), errors);
-        String destination = getOrigin(trainArrivalDto.originStation(), errors);
+        String destination = getOrigin(trainArrivalDto.secondStation(), errors);
 
         EnrichedTrainMetadataDto train = trainMetadataAdapter.adapt(Optional.of(trainArrivalDto.train()));
         List<String> direction = getDirection(trainArrivalDto.mainStations(), errors);

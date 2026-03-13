@@ -1,7 +1,9 @@
 package com.stavre.cfrapiadapter.dto.request;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class RequestStationTrainsDto {
     String Date;
@@ -11,19 +13,6 @@ public class RequestStationTrainsDto {
     String IsSearchWanted;
     String IsReCaptchaFailed;
     String __RequestVerificationToken;
-
-    public RequestStationTrainsDto(String date, String stationName, RequestDto requestDto) {
-        this.Date = date;
-        this.StationName = stationName;
-
-        this.ReCaptcha = requestDto.ReCaptcha;
-        this.ConfirmationKey = requestDto.ConfirmationKey;
-        this.IsSearchWanted = requestDto.IsSearchWanted;
-        this.IsReCaptchaFailed = requestDto.IsReCaptchaFailed;
-        this.__RequestVerificationToken = requestDto.__RequestVerificationToken;
-
-
-    }
 
 
 

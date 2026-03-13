@@ -4,15 +4,13 @@ import com.stavre.cfrapiadapter.adapter.TrainArrivalAdapter;
 import com.stavre.cfrapiadapter.adapter.TrainDepartureAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
-import com.stavre.cfrapiadapter.dto.train.TrainStopDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
 import com.stavre.cfrapiadapter.repository.StationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 
 import java.util.List;
-import java.util.Optional;
+
 
 @RequiredArgsConstructor
 @Service

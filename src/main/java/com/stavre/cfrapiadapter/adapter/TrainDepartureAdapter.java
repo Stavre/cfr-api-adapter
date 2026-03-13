@@ -2,7 +2,7 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.train.TrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.train.StationTrainDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 
 import java.time.Duration;
@@ -19,19 +19,19 @@ public class TrainDepartureAdapter {
     private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
     private final AdapterUtils utils = new AdapterUtils();
 
-    public EnrichedTrainDepartureDto adapt(Optional<TrainDepartureDto> trainDepartureDtoOpt, String date) {
+    public EnrichedTrainDepartureDto adapt(Optional<StationTrainDto> trainDepartureDtoOpt, String date) {
         if (trainDepartureDtoOpt.isEmpty()) {
             return new EnrichedTrainDepartureDto(List.of("Could not scrap train departure from CFR page"));
         }
 
-        TrainDepartureDto trainDepartureDto = trainDepartureDtoOpt.get();
+        StationTrainDto trainDepartureDto = trainDepartureDtoOpt.get();
         List<String> errors = new ArrayList<>();
 
-        LocalDateTime departure = utils.getDepartureTimestamp(date, trainDepartureDto.departureTime(), errors);
-        Duration departureDelay = utils.getDelay(trainDepartureDto.departureTimeLabel(), errors);
+        LocalDateTime departure = utils.getDepartureTimestamp(date, trainDepartureDto.time(), errors);
+        Duration departureDelay = utils.getDelay(trainDepartureDto.timeLabel(), errors);
 
         String platform = utils.getTrainPlatform(trainDepartureDto.platform(), errors);
-        String destination = getDestination(trainDepartureDto.destinationName(), errors);
+        String destination = getDestination(trainDepartureDto.secondStation(), errors);
 
         EnrichedTrainMetadataDto train = trainMetadataAdapter.adapt(Optional.of(trainDepartureDto.train()));
         List<String> direction = getDirection(trainDepartureDto.mainStations(), errors);
