@@ -7,13 +7,11 @@ import com.stavre.cfrapiadapter.dto.request.metadata.RequestTrainMetadataFactory
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
 import com.stavre.cfrapiadapter.dto.response.TrainResponseDto;
 import com.stavre.cfrapiadapter.service.TrainService;
-import com.stavre.cfrapiadapter.utils.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -37,20 +35,15 @@ public class TrainController {
 
     @GetMapping("/train/{trainId}/delay")
     public TrainDelayResponseDto getTrainDelay(@PathVariable String trainId,
-                                               @RequestParam(required = false) String date,
+                                               @RequestParam(value = "date", required = false) String inputDate,
                                                @RequestParam(required = false) String station) {
-        String _date = date == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : date;
+        String date = inputDate == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : inputDate;
 
-        EnrichedTrainDto trainDto = service.getTrainStops(trainId, _date);
+        EnrichedTrainDto trainDto = service.getTrainStops(trainId, date);
         if (station == null) {
-            return delayResponseAdapter.adapt(trainDto, _date);
+            return delayResponseAdapter.adapt(trainDto, date);
         }
 
-        return delayResponseAdapter.adapt(trainDto, _date, station);
+        return delayResponseAdapter.adapt(trainDto, date, station);
     }
-//
-//    @GetMapping("/trains")
-//    public List<String> getAllTrainNumbers() {
-//        return service.getAllTrains(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-//    }
 }

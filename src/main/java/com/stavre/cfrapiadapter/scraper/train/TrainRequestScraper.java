@@ -25,7 +25,16 @@ public class TrainRequestScraper {
         String isReCaptchaFailed = verificationTokensScraper.scrapeIsReCaptchaFailed(pageBody);
         String requestVerificationToken = verificationTokensScraper.scrapeRequestVerificationToken(pageBody);
 
-        return new RequestTrainTimeTableDto(date, trainRunningNumber, selectedBranchCode, reCaptcha, confirmationKey, isSearchWanted, isReCaptchaFailed,requestVerificationToken);
+        return RequestTrainTimeTableDto.builder()
+                .date(date)
+                .trainRunningNumber(trainRunningNumber)
+                .selectedBranchCode(selectedBranchCode)
+                .recaptcha(reCaptcha)
+                .confirmationKey(confirmationKey)
+                .isSearchWanted(isSearchWanted)
+                .isRecaptchaFailed(isReCaptchaFailed)
+                .requestVerificationToken(requestVerificationToken)
+                .build();
     }
 
     private String scrapeTrainRunningNumber(Element pageBody) {

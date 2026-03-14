@@ -1,125 +1,111 @@
 package com.stavre.cfrapiadapter.utils;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+@RequiredArgsConstructor
+@Component
 public class AdapterUtils {
 
+    private final DateTimeUtils dateTimeUtils;
+
     public String getTrainPlatform(String platform, List<String> errors) {
-        if (platform.isBlank()) {
-            errors.add("Train platform is blank");
+        if (platform == null || platform.isBlank()) {
+            errors.add("Platform string is null or blank.");
             return null;
         }
 
-        return platform.replace("linia", "").trim();
+        String regex = "^linia\\s+(.+)$";
+        var pattern = java.util.regex.Pattern.compile(regex); // no CASE_INSENSITIVE
+        var matcher = pattern.matcher(platform.trim());
+
+        if (!matcher.matches()) {
+            errors.add("Platform string does not match expected format: " + platform);
+            return null;
+        }
+
+        return matcher.group(1).trim();
     }
 
-    public LocalDateTime getDepartureTimestamp(String date, String time, List<String> errors) {
-        LocalDateTime arrivalTimestamp = null;
+    public LocalDateTime getTimestamp(String date, String time, List<String> errors) {
 
-        LocalDate convertedDate = null;
-
-        Optional<LocalDate> convertedDateOpt = convertDate(date);
-
-        if (convertedDateOpt.isEmpty()) {
-            errors.add("Could not convert departure date %s to date object".formatted(date));
-        } else {
-            convertedDate = convertedDateOpt.get();
+        Optional<LocalDate> dateOpt = dateTimeUtils.convertDate(date);
+        if (dateOpt.isEmpty()) {
+            errors.add("Could not convert date %s to date object".formatted(date));
+            errors.add("Could not compute timestamp");
+            return null;
         }
 
-        LocalTime convertedArrivalTime = null;
-        Optional<LocalTime> convertedArrivalTimeOpt = convertTime(time);
-
-        if (convertedArrivalTimeOpt.isEmpty()) {
-            errors.add("Could not convert departure time %s to time object".formatted(time));
-        } else {
-            convertedArrivalTime = convertedArrivalTimeOpt.get();
+        Optional<LocalTime> timeOpt = dateTimeUtils.convertTime(time);
+        if (timeOpt.isEmpty()) {
+            errors.add("Could not convert time %s to time object".formatted(time));
+            errors.add("Could not compute timestamp");
+            return null;
         }
 
-        if (convertedDateOpt.isPresent() && convertedArrivalTimeOpt.isPresent()) {
-            arrivalTimestamp = convertedDate.atTime(convertedArrivalTime);
-        } else {
-            errors.add("Could not compute departure timestamp");
-        }
-
-        return arrivalTimestamp;
+        return dateOpt.flatMap(d ->
+                timeOpt.map(d::atTime)
+        ).orElse(null);
     }
 
-    public LocalDateTime getArrivalTimestamp(String date, String time, List<String> errors) {
-        LocalDateTime arrivalTimestamp = null;
-
-        LocalDate convertedDate = null;
-
-        Optional<LocalDate> convertedDateOpt = convertDate(date);
-
-        if (convertedDateOpt.isEmpty()) {
-            errors.add("Could not convert arrival date %s to date object".formatted(date));
-        } else {
-            convertedDate = convertedDateOpt.get();
+    public Duration getDelay(String input, List<String> errors) {
+        if (input == null || input.isBlank()) {
+            errors.add("Delay string is null or blank");
+            return null;
         }
 
-        LocalTime convertedArrivalTime = null;
-        Optional<LocalTime> convertedArrivalTimeOpt = convertTime(time);
+        String trimmed = input.trim();
 
-        if (convertedArrivalTimeOpt.isEmpty()) {
-            errors.add("Could not convert arrival time %s to time object".formatted(time));
-        } else {
-            convertedArrivalTime = convertedArrivalTimeOpt.get();
+        // Case 1: "la timp" or "la timp*"
+        if (trimmed.matches("^la timp\\*?$")) {
+            return Duration.ofMinutes(0);
         }
 
-        if (convertedDateOpt.isPresent() && convertedArrivalTimeOpt.isPresent()) {
-            arrivalTimestamp = convertedDate.atTime(convertedArrivalTime);
-        } else {
-            errors.add("Could not compute arrival timestamp");
-        }
+        // Case 2: "+7 min (întârziere)" or "+7 min (întârziere)*"
+        // Mandatory space before "min"
+        Pattern pattern = Pattern.compile("^\\+(\\d+) min.*$");
+        Matcher matcher = pattern.matcher(trimmed);
 
-        return arrivalTimestamp;
-    }
-
-    public Optional<LocalTime> convertTime(String time) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H:mm");
-            return Optional.of(LocalTime.parse(time, formatter));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<LocalDate> convertDate(String date) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-            return Optional.of(LocalDate.parse(date, formatter));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
-
-    public Duration getDelay(String delay, List<String> errors) {
-        try {
-            if (delay.contains("la timp") || delay.isBlank()) {
-                return Duration.ofMinutes(0);
-            }
-
-            String durationInMinutes = delay.replace("*", "");
-
-            // Extract the number before "min"
-            String minutesPart = durationInMinutes.split("min")[0].trim();
-
-            // Remove any leading "+" or other symbols
-            minutesPart = minutesPart.replace("+", "").trim();
-
-            int minutes = Integer.parseInt(minutesPart);
-
+        if (matcher.matches()) {
+            int minutes = Integer.parseInt(matcher.group(1));
             return Duration.ofMinutes(minutes);
-        } catch (Exception e) {
-            errors.add("Could not convert label %s into Duration".formatted(delay));
-            return null;
         }
 
+        errors.add("Could not extract delay from string: " + input);
+        return null;
+    }
+
+    public List<String> getDirection(String mainStations, List<String> errors) {
+
+        if (mainStations == null || mainStations.isBlank()) {
+            errors.add("No main stations found");
+            return List.of();
+        }
+
+        return Arrays.stream(mainStations.split("-"))
+                .map(String::trim)
+                .toList();
+    }
+
+    public Duration getStopDuration(String duration, List<String> errors) {
+        try {
+            if (duration.contains("necunoscută")) {
+                return null;
+            }
+            int durationAsInt = Integer.parseInt(duration.split(" ")[0]);
+            return Duration.ofMinutes(durationAsInt);
+        } catch (Exception e) {
+            errors.add("Could not convert label %s into duration".formatted(duration));
+            return null;
+        }
     }
 }

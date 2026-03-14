@@ -1,6 +1,5 @@
 package com.stavre.cfrapiadapter.dto.request.metadata;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record RequestTrainMetadataDto(

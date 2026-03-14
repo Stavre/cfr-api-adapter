@@ -1,7 +1,9 @@
 package com.stavre.cfrapiadapter.dto.scraper;
 
+import lombok.Builder;
 import java.util.List;
 
+@Builder
 public record TrainStopDto(
         String arrivalTime,
         String arrivalTimeLabel,
@@ -11,5 +13,4 @@ public record TrainStopDto(
         List<String> stationLabels,
         String km,
         String stopDuration,
-        String platform) {
-}
+        String platform) {}

@@ -1,12 +1,13 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
+import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -16,14 +17,13 @@ public class TrainStopsScraper {
 
     private final ScraperUtils utils;
 
-
     public List<Optional<TrainStopDto>> scrapeTrainStops(Element timeTableElement) {
         return scrapeTrainStopRowElements(timeTableElement).stream()
                 .map(this::scrapeTrainStop)
                 .toList();
     }
 
-    private Elements scrapeTrainStopRowElements(Element page) {
+    private List<Element> scrapeTrainStopRowElements(Element page) {
         return page.select("ul.list-group > li.list-group-item");
     }
 
@@ -41,14 +41,26 @@ public class TrainStopsScraper {
             String stopDuration = scrapeStopDuration(innerRow);
             String platform = scrapePlatform(row);
 
-            return Optional.of(new TrainStopDto(arrivalTime, arrivalTimeLabel, departureTime, departureTimeLabel, stationName, stationLabels, km, stopDuration, platform));
+            TrainStopDto result = TrainStopDto.builder()
+                    .arrivalTime(arrivalTime)
+                    .arrivalTimeLabel(arrivalTimeLabel)
+                    .departureTime(departureTime)
+                    .departureTimeLabel(departureTimeLabel)
+                    .stationName(stationName)
+                    .stationLabels(stationLabels)
+                    .km(km)
+                    .stopDuration(stopDuration)
+                    .platform(platform)
+                    .build();
+
+            return Optional.of(result);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     private String scrapeDepartureTime(Element row) {
-        Elements leftTime = row.child(0).child(2).getElementsByAttributeValue("class", "text-1-3rem text-right");
+        List<Element> leftTime = row.child(0).child(2).getElementsByAttributeValue("class", "text-1-3rem text-right");
 
         if (leftTime == null) {
             return "";
@@ -57,7 +69,7 @@ public class TrainStopsScraper {
     }
 
     private String scrapeDepartureTimeLabel(Element row) {
-        Elements leftTime = row.child(0).child(2).select(".text-0-8rem");
+        List<Element> leftTime = row.child(0).child(2).select(".text-0-8rem");
 
         if (leftTime == null) {
             return "";
@@ -66,7 +78,7 @@ public class TrainStopsScraper {
     }
 
     private String scrapeArrivalTime(Element row) {
-        Elements rightTime = row.child(0).child(0).getElementsByAttributeValue("class", "text-1-3rem");
+        List<Element> rightTime = row.child(0).child(0).getElementsByAttributeValue("class", "text-1-3rem");
         if (rightTime == null) {
             return "";
         }
@@ -74,7 +86,7 @@ public class TrainStopsScraper {
     }
 
     private String scrapeArrivalTimeLabel(Element row) {
-        Elements leftTime = row.child(0).child(0).select(".text-0-8rem");
+        List<Element> leftTime = row.child(0).child(0).select(".text-0-8rem");
 
         if (leftTime == null) {
             return "";
@@ -97,10 +109,9 @@ public class TrainStopsScraper {
         if (divWithValues == null) {
             return List.of();
         }
-        Elements values = divWithValues.getElementsByAttributeValue("class", "text-0-8rem");
+        List<Element> values = divWithValues.getElementsByAttributeValue("class", "text-0-8rem");
         return values.stream().map(Element::text).toList();
     }
-
 
     private String scrapeKm(Element innerRow) {
         Element kmEl = innerRow.selectFirst(".col-md-2");
@@ -113,10 +124,10 @@ public class TrainStopsScraper {
     }
 
     private String scrapePlatform(Element innerRow) {
-        Elements allCols = innerRow.select(".col-md-2, .col-md-3, .col-md-5");
+        List<Element> allCols = innerRow.select(".col-md-2, .col-md-3, .col-md-5");
         for (Element c : allCols) {
             String t = c.text().trim();
-            if (t.toLowerCase().contains("linia")) {
+            if (t.contains("linia")) {
                 return t;
             }
         }

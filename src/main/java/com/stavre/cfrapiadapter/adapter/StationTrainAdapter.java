@@ -1,104 +1,122 @@
 package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
-import com.stavre.cfrapiadapter.dto.enriched.StationTrainType;
-import com.stavre.cfrapiadapter.dto.scraper.StationTrainDto;
-import com.stavre.cfrapiadapter.utils.AdapterUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+@RequiredArgsConstructor
 @Component
 public class StationTrainAdapter {
 
-    private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
-    private final AdapterUtils utils = new AdapterUtils();
+    /**
+     * Merge arrival and departure DTOs into a single EnrichedStationTrainDto.
+     * Rules:
+     * - If both inputs are empty -> return Optional.empty()
+     * - If one input is empty -> set the fields coming from that side to null and add an error
+     * - Common fields (stopDuration, train, platform, direction) are set only when both DTOs are present
+     *   and their values are equal. If they differ -> set the common field to null and add an error.
+     *
+     * @param arrivalOpt   optional arrival DTO
+     * @param departureOpt optional departure DTO
+     * @return optional merged EnrichedStationTrainDto
+     */
+    public Optional<EnrichedStationTrainDto> adapt(
+            Optional<EnrichedTrainArrivalDto> arrivalOpt,
+            Optional<EnrichedTrainDepartureDto> departureOpt) {
 
-    public EnrichedStationTrainDto adapt(Optional<StationTrainDto> trainArrivalDtoOpt, String date) {
-        if (trainArrivalDtoOpt.isEmpty()) {
-            return new EnrichedStationTrainDto(StationTrainType.ARRIVAL, List.of("Could not scrap train from CFR's station page"));
+        if (arrivalOpt.isEmpty() && departureOpt.isEmpty()) {
+            return Optional.empty();
         }
 
-        StationTrainDto trainArrivalDto = trainArrivalDtoOpt.get();
         List<String> errors = new ArrayList<>();
 
-        LocalDateTime departure = utils.getArrivalTimestamp(date, trainArrivalDto.time(), errors);
-        Duration departureDelay = utils.getDelay(trainArrivalDto.timeLabel(), errors);
+        EnrichedTrainArrivalDto arrival = arrivalOpt.orElse(null);
+        EnrichedTrainDepartureDto departure = departureOpt.orElse(null);
 
-        String platform = utils.getTrainPlatform(trainArrivalDto.platform(), errors);
-        String destination = getOrigin(trainArrivalDto.secondStation(), errors);
-
-        EnrichedTrainMetadataDto train = trainMetadataAdapter.adapt(Optional.of(trainArrivalDto.train()));
-        List<String> direction = getDirection(trainArrivalDto.mainStations(), errors);
-        Duration stopDuration = getStopDuration(trainArrivalDto.stopDuration(), errors);
-        LocalDateTime stopStartsAt = getStopEndsAt(date, trainArrivalDto.stopDuration(), errors);
-
-        return new EnrichedStationTrainDto(StationTrainType.ARRIVAL, departure,
-                departureDelay, platform, destination, train, direction, stopDuration, stopStartsAt, errors);
-    }
-
-    private LocalDateTime getStopEndsAt(String date, String duration, List<String> errors) {
-        if (duration.contains("necunoscută")) {
-            return null;
+        // If one side is missing, add an error and fields from that side will remain null
+        if (arrival == null) {
+            errors.add("Missing arrival information");
+        }
+        if (departure == null) {
+            errors.add("Missing departure information");
         }
 
+        // Populate side-specific fields (null when corresponding DTO is missing)
+        String fromStation = arrival == null ? null : arrival.fromStation();
+        LocalDateTime arrivalTimestamp = arrival == null ? null : arrival.arrivalTimestamp();
+        Duration arrivalDelay = arrival == null ? null : arrival.arrivalDelay();
 
-        String extractedTime = duration.replace(")", "").split("la")[1].trim();
-        Optional<LocalDate> dateOpt = utils.convertDate(date);
-        Optional<LocalTime> timeOpt = utils.convertTime(extractedTime);
+        String toStation = departure == null ? null : departure.toStation();
+        LocalDateTime departureTimestamp = departure == null ? null : departure.departureTimestamp();
+        Duration departureDelay = departure == null ? null : departure.departureDelay();
 
-        if (dateOpt.isEmpty()) {
-            errors.add("Could not parse date %s into date object".formatted(date));
-            return null;
-        }
+        // Determine common fields: stopDuration, train, platform, direction (mainStations)
+        Duration stopDuration = null;
+        EnrichedTrainMetadataDto train = null;
+        String platform = null;
+        List<String> direction = null;
 
-        if (timeOpt.isEmpty()) {
-            errors.add("Could not extract time object from label %s".formatted(duration));
-            return null;
-        }
-
-        return dateOpt.get().atTime(timeOpt.get());
-
-    }
-
-    private Duration getStopDuration(String duration, List<String> errors) {
-        try {
-            if (duration.contains("necunoscută")) {
-                return null;
+        if (arrival != null && departure != null) {
+            // stopDuration
+            if (Objects.equals(arrival.stopDuration(), departure.stopDuration())) {
+                stopDuration = arrival.stopDuration();
+            } else {
+                errors.add(String.format("Mismatched stopDuration: arrival=%s, departure=%s",
+                        arrival.stopDuration(), departure.stopDuration()));
             }
-            int durationAsInt = Integer.parseInt(duration.split(" ")[0]);
-            return Duration.ofMinutes(durationAsInt);
-        } catch (Exception e) {
-            errors.add("Could not convert label %s into duration".formatted(duration));
-            return null;
+
+            // train (EnrichedTrainMetadataDto is a record so equals() works)
+            if (Objects.equals(arrival.train(), departure.train())) {
+                train = arrival.train();
+            } else {
+                errors.add(String.format("Mismatched train metadata: arrival=%s, departure=%s",
+                        arrival.train(), departure.train()));
+            }
+
+            // platform
+            if (Objects.equals(arrival.platform(), departure.platform())) {
+                platform = arrival.platform();
+            } else {
+                errors.add(String.format("Mismatched platform: arrival=%s, departure=%s",
+                        arrival.platform(), departure.platform()));
+            }
+
+            // direction (mainStations)
+            if (Objects.equals(arrival.mainStations(), departure.mainStations())) {
+                direction = arrival.mainStations();
+            } else {
+                errors.add(String.format("Mismatched direction (mainStations): arrival=%s, departure=%s",
+                        arrival.mainStations(), departure.mainStations()));
+            }
+        } else {
+            // If one side is missing we cannot reliably determine common fields
+            errors.add("Cannot determine common fields because one side is missing");
         }
+
+        EnrichedStationTrainDto result = EnrichedStationTrainDto.builder()
+                .fromStation(fromStation)
+                .arrival(arrivalTimestamp)
+                .arrivalDelay(arrivalDelay)
+                .toStation(toStation)
+                .departure(departureTimestamp)
+                .departureDelay(departureDelay)
+                .stopDuration(stopDuration)
+                .train(train)
+                .platform(platform)
+                .direction(direction)
+                .errors(errors)
+                .build();
+
+        return Optional.of(result);
     }
 
-    private List<String> getDirection(String mainStations, List<String> errors) {
-        if (mainStations.isBlank()) {
-            errors.add("No main stations found");
-            return null;
-        }
-
-        return Arrays.stream(mainStations.split("-"))
-                .map(String::trim)
-                .toList();
-    }
-
-    private String getOrigin(String originName, List<String> errors) {
-        if (originName.isBlank()) {
-            errors.add("Origin name is blank");
-            return null;
-        }
-
-        return originName.trim();
-    }
 }

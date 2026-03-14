@@ -8,4 +8,4 @@ public record StationDelayResponseDto(
         String forDate,
         String station,
         Duration totalDelay
-) { }
+) {}

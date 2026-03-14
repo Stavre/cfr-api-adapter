@@ -1,7 +1,6 @@
 package com.stavre.cfrapiadapter.dto.enriched;
 
 import lombok.With;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +19,6 @@ public record EnrichedTrainStopDto(
         List<String> errors
 ) {
     public EnrichedTrainStopDto(List<String> errors) {
-        this(null, null, null,null, null, null,null, null, null,errors);
+        this(null, null, null, null, null, null, null, null, null, errors);
     }
 }

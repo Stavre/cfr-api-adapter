@@ -3,23 +3,21 @@ package com.stavre.cfrapiadapter.scraper.train;
 import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 public class TrainBranchScraper {
 
-    public Elements scrapeTrainTimeTables(Element page) {
+    public List<Element> scrapeTrainTimeTables(Element page) {
         return page.getElementsByAttributeValue("class", "list-group");
     }
 
     public List<TrainBranchDto> scrapeBranches(Element pageBody) {
-        Elements branches = scrapeBranchElements(pageBody);
+        List<Element> branches = scrapeBranchElements(pageBody);
         if (branches.isEmpty()) {
             return List.of(new TrainBranchDto("Main branch", null, null));
         }
@@ -27,7 +25,7 @@ public class TrainBranchScraper {
         return branches.stream().map(this::scrapeBranch).toList();
     }
 
-    private Elements scrapeBranchElements(Element pageBody) {
+    private List<Element> scrapeBranchElements(Element pageBody) {
         return pageBody
                 .getElementsByClass("jumbotron p-3 mb-3")
                 .getFirst()

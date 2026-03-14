@@ -4,4 +4,4 @@ public record TrainBranchDto(
         String name,
         String originStation,
         String destinationStation
-) { }
+) {}

@@ -1,7 +1,6 @@
 package com.stavre.cfrapiadapter.dto.request.metadata;
 
-import com.stavre.cfrapiadapter.dto.enriched.StationTrainType;
-import com.stavre.cfrapiadapter.utils.DateUtils;
+import com.stavre.cfrapiadapter.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,15 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestStationMetadataFactory {
 
-    private final DateUtils dateUtils;
+    private final DateTimeUtils dateTimeUtils;
 
-    public RequestStationMetadataDto createDepartureRequestMetadata(String date, String station) {
-        String _date = date == null ? dateUtils.getCurrentDate() : date;
-        return new RequestStationMetadataDto(_date, station, StationTrainType.DEPARTURE);
-    }
-
-    public RequestStationMetadataDto createArrivalRequestMetadata(String date, String station) {
-        String _date = date == null ? dateUtils.getCurrentDate() : date;
-        return new RequestStationMetadataDto(_date, station, StationTrainType.ARRIVAL);
+    public RequestStationMetadataDto createDepartureRequestMetadata(String inputDate, String station) {
+        String date = inputDate == null ? dateTimeUtils.getCurrentDate() : inputDate;
+        return new RequestStationMetadataDto(date, station);
     }
 }

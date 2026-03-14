@@ -1,19 +1,31 @@
 package com.stavre.cfrapiadapter.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Builder;
 
-@AllArgsConstructor
-@Data
+@Builder
 public class RequestTrainTimeTableDto {
-    String Date;
-    String TrainRunningNumber;
-    String SelectedBranchCode;
-    String ReCaptcha;
-    String ConfirmationKey;
-    String IsSearchWanted;
-    String IsReCaptchaFailed;
-    String __RequestVerificationToken;
+    @JsonProperty("Date")
+    private String date;
 
-    //    TODO: Find a way to use record or POJO
+    @JsonProperty("TrainRunningNumber")
+    private String trainRunningNumber;
+
+    @JsonProperty("SelectedBranchCode")
+    private String selectedBranchCode;
+
+    @JsonProperty("ReCaptcha")
+    private String recaptcha;
+
+    @JsonProperty("ConfirmationKey")
+    private String confirmationKey;
+
+    @JsonProperty("IsSearchWanted")
+    private String isSearchWanted;
+
+    @JsonProperty("IsReCaptchaFailed")
+    private String isRecaptchaFailed;
+
+    @JsonProperty("__RequestVerificationToken")
+    private String requestVerificationToken;
 }

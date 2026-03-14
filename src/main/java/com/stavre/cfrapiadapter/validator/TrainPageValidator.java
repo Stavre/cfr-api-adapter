@@ -6,7 +6,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -14,6 +13,7 @@ import java.util.List;
 public class TrainPageValidator {
 
     private final ScraperUtils scraperUtils;
+
     public void validate(@NonNull String htmlPage) {
         Element pageBody = scraperUtils.scrapePageBody(htmlPage);
 
@@ -31,17 +31,5 @@ public class TrainPageValidator {
         }
 
         throw new CFRException(errors);
-    }
-
-    private boolean trainMissing(Element pageBody) {
-        return pageBody.html().contains("Nu a fost găsit niciun tren cu acest număr!");
-    }
-
-    private boolean trainMissingOnDate(Element pageBody) {
-        return pageBody.html().contains("nu circulă în data de");
-    }
-
-    private boolean requestOutsideOfTimeInterval(Element pageBody) {
-        return pageBody.html().contains("Data nu se află în intervalul de 30 de zile!");
     }
 }

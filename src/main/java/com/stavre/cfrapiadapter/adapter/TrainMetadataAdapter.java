@@ -2,19 +2,17 @@ package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+@Component
+@RequiredArgsConstructor
 public class TrainMetadataAdapter {
 
-    public EnrichedTrainMetadataDto adapt(Optional<TrainMetadataDto> trainDtoOptional) {
-        if (trainDtoOptional.isEmpty()) {
-            return new EnrichedTrainMetadataDto(List.of("Could not scrape train from CFR page"));
-        }
+    public EnrichedTrainMetadataDto adapt(TrainMetadataDto trainMetadataDto) {
 
-        TrainMetadataDto trainMetadataDto = trainDtoOptional.get();
         List<String> errors = new ArrayList<>();
 
         String trainNumber = getNumber(trainMetadataDto.trainNumber(), errors);

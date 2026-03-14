@@ -4,11 +4,11 @@ import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
-
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +34,7 @@ public class TrainScraper {
 
     public Map<TrainBranchDto, List<Optional<TrainStopDto>>> scrapeTrainBranches(Element pageBody) {
 
-        Elements timeTables = trainBranchScraper.scrapeTrainTimeTables(pageBody);
+        List<Element> timeTables = trainBranchScraper.scrapeTrainTimeTables(pageBody);
         List<TrainBranchDto> branches = trainBranchScraper.scrapeBranches(pageBody);
         List<List<Optional<TrainStopDto>>> stops = timeTables.stream()
                 .map(trainStopsScraper::scrapeTrainStops)

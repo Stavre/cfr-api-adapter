@@ -3,16 +3,19 @@ package com.stavre.cfrapiadapter.adapter;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Component
+@RequiredArgsConstructor
 public class TrainStopAdapter {
 
-    public final AdapterUtils utils = new AdapterUtils();
+    public final AdapterUtils utils;
 
     public EnrichedTrainStopDto adapt(Optional<TrainStopDto> scrapedDtoOpt, String date) {
         if (scrapedDtoOpt.isEmpty()) {
@@ -22,10 +25,10 @@ public class TrainStopAdapter {
         TrainStopDto scrapedDto = scrapedDtoOpt.get();
         List<String> errors = new ArrayList<>();
 
-        LocalDateTime arrivalTimestamp = utils.getArrivalTimestamp(date, scrapedDto.arrivalTime(), errors);
+        LocalDateTime arrivalTimestamp = utils.getTimestamp(date, scrapedDto.arrivalTime(), errors);
         Duration arrivalDelay = utils.getDelay(scrapedDto.arrivalTimeLabel(), errors);
 
-        LocalDateTime departureTimestamp = utils.getDepartureTimestamp(date, scrapedDto.departureTime(), errors);
+        LocalDateTime departureTimestamp = utils.getTimestamp(date, scrapedDto.departureTime(), errors);
         Duration departureDelay = utils.getDelay(scrapedDto.departureTimeLabel(), errors);
 
         String station = getStation(scrapedDto.stationName(), errors);
@@ -35,7 +38,7 @@ public class TrainStopAdapter {
         List<String> trainStopMessages = scrapedDto.stationLabels();
 
         return new EnrichedTrainStopDto(arrivalTimestamp, arrivalDelay,
-                departureTimestamp,departureDelay,
+                departureTimestamp, departureDelay,
                 station, journeyKm,
                 stopDuration, platform,
                 trainStopMessages, errors);
@@ -57,7 +60,7 @@ public class TrainStopAdapter {
 
             int journeyKm = Integer.parseInt(km.replace("km", "").trim());
             if (journeyKm < 0) {
-                errors.add("Expected number of kilometers to be greater than or equal to 0, instead it was %s".formatted(km));
+                errors.add("Expected number of kilometers to be >= 0, instead it was %s".formatted(km));
                 return null;
             }
 

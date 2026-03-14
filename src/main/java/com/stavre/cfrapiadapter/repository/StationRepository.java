@@ -1,6 +1,9 @@
 package com.stavre.cfrapiadapter.repository;
 
-import com.stavre.cfrapiadapter.dto.scraper.StationTrainDto;
+import com.stavre.cfrapiadapter.adapter.EnrichedTrainArrivalAdapter;
+import com.stavre.cfrapiadapter.adapter.EnrichedTrainDepartureAdapter;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
 import com.stavre.cfrapiadapter.proxy.TrainStationProxy;
 import com.stavre.cfrapiadapter.scraper.station.StationRequestScraper;
@@ -8,7 +11,6 @@ import com.stavre.cfrapiadapter.scraper.station.StationScraper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -18,32 +20,31 @@ import java.util.Optional;
 public class StationRepository {
     private final TrainStationProxy proxy;
     private final StationRequestScraper stationRequestScraper;
-    private final StationScraper stationScraper;
+    private final StationScraper scraper;
 
-    public List<Optional<StationTrainDto>> getDepartures(String stationName, String date) {
-        try {
-            String response = proxy.getStationTokenPage(stationName, date);
-            RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
+    private final EnrichedTrainArrivalAdapter arrivalAdapter;
+    private final EnrichedTrainDepartureAdapter departureAdapter;
 
-            String secondResult = proxy.getStationTrains(request);
-            return stationScraper.scrapeDepartures(secondResult);
-        } catch (RuntimeException e) {
-            log.error("Could not extract departures for station %s, date %s".formatted(stationName, date));
-            return List.of();
-        }
+    public List<Optional<EnrichedTrainArrivalDto>> getArrivals(String stationName, String date) {
+        String response = proxy.getStationTokenPage(stationName, date);
+        RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
+
+        String secondResult = proxy.getStationTrains(request);
+
+        return scraper.scrapeArrivals(secondResult)
+                .stream()
+                .map(arrival -> arrivalAdapter.adapt(arrival, date))
+                .toList();
     }
 
-    public List<Optional<StationTrainDto>> getArrivals(String stationName, String date) {
-        try {
-            String response = proxy.getStationTokenPage(stationName, date);
-            RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
+    public List<Optional<EnrichedTrainDepartureDto>> getDepartures(String stationName, String date) {
+        String response = proxy.getStationTokenPage(stationName, date);
+        RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
 
-            String secondResult = proxy.getStationTrains(request);
-
-            return stationScraper.scrapeArrivals(secondResult);
-        } catch (RuntimeException e) {
-            log.error("Could not extract arrivals for station %s, date %s".formatted(stationName, date));
-            return List.of();
-        }
+        String secondResult = proxy.getStationTrains(request);
+        return scraper.scrapeDepartures(secondResult)
+                .stream()
+                .map(departure -> departureAdapter.adapt(departure, date))
+                .toList();
     }
 }

@@ -1,6 +1,6 @@
 package com.stavre.cfrapiadapter.dto.request.metadata;
 
-import com.stavre.cfrapiadapter.utils.DateUtils;
+import com.stavre.cfrapiadapter.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class RequestTrainMetadataFactory {
 
-    private final DateUtils dateUtils;
+    private final DateTimeUtils dateTimeUtils;
 
-    public RequestTrainMetadataDto create(String date, String trainNumber) {
-        String _date = date == null ? dateUtils.getCurrentDate() : date;
-        return new RequestTrainMetadataDto(_date, trainNumber);
+    public RequestTrainMetadataDto create(String input, String trainNumber) {
+        String date = input == null ? dateTimeUtils.getCurrentDate() : input;
+        return new RequestTrainMetadataDto(date, trainNumber);
     }
 }

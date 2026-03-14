@@ -1,7 +1,6 @@
 package com.stavre.cfrapiadapter.scraper.station;
 
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
-import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
 import com.stavre.cfrapiadapter.scraper.VerificationTokensScraper;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,15 @@ public class StationRequestScraper {
         String isReCaptchaFailed = verificationTokensScraper.scrapeIsReCaptchaFailed(pageBody);
         String requestVerificationToken = verificationTokensScraper.scrapeRequestVerificationToken(pageBody);
 
-        return new RequestStationTrainsDto(date, stationName, reCaptcha, confirmationKey, isSearchWanted, isReCaptchaFailed,requestVerificationToken);
+        return RequestStationTrainsDto.builder()
+                .date(date)
+                .stationName(stationName)
+                .recaptcha(reCaptcha)
+                .confirmationKey(confirmationKey)
+                .isSearchWanted(isSearchWanted)
+                .isRecaptchaFailed(isReCaptchaFailed)
+                .requestVerificationToken(requestVerificationToken)
+                .build();
     }
 
     private String scrapeStationName(Element pageBody) {

@@ -1,22 +1,27 @@
 package com.stavre.cfrapiadapter.dto.enriched;
 
+import lombok.Builder;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Builder
 public record EnrichedStationTrainDto(
-        StationTrainType type,
-        LocalDateTime time,
-        Duration delay,
-        String platform,
-        String secondStation,
-        EnrichedTrainMetadataDto train,
-        List<String> direction,
+        String fromStation,
+        LocalDateTime arrival,
+        Duration arrivalDelay,
+
+        String toStation,
+        LocalDateTime departure,
+        Duration departureDelay,
+
         Duration stopDuration,
-        LocalDateTime stopStartsAt,
+        EnrichedTrainMetadataDto train,
+        String platform,
+        List<String> direction,
         List<String> errors
 ) {
-    public EnrichedStationTrainDto(StationTrainType type, List<String> errors) {
-        this(type, null, null, null, null, null, null, null, null, errors);
+    public EnrichedStationTrainDto(List<String> errors) {
+        this(null, null, null, null, null, null, null, null, null, null, errors);
     }
 }

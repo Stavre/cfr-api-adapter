@@ -9,7 +9,9 @@ public class StationTrainMetadataScraper {
 
     public TrainMetadataDto scrapeTrainMetadata(Element row) {
 
+
         Element trainContainer = scrapeTrainContainer(row);
+
 
         String trainCategory = scrapeCategory(trainContainer);
         String trainNumber = scrapeNumber(trainContainer);
@@ -19,7 +21,7 @@ public class StationTrainMetadataScraper {
     }
 
     private Element scrapeTrainContainer(Element row) {
-        return row.select(".col-md-2 .line-height-1-25").get(1);
+        return row.getElementsByClass("row").getFirst();
     }
 
     private String scrapeCategory(Element trainContainer) {
