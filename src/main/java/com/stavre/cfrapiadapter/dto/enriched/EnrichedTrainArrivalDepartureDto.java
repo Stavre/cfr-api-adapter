@@ -7,11 +7,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record EnrichedTrainDepartureDto(
-        LocalDateTime departureTimestamp,
-        Duration departureDelay,
+public record EnrichedTrainArrivalDepartureDto(
+        LocalDateTime timestamp,
+        Duration delay,
         String platform,
-        String toStation,
+        String otherStation,
         TrainMetadataDto train,
         List<String> mainStations,
-        Duration stopDuration) {}
+        Duration stopDuration
+) {}

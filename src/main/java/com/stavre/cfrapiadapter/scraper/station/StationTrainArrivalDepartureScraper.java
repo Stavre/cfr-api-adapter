@@ -9,18 +9,18 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class StationTrainArrivalsScraper {
+public class StationTrainArrivalDepartureScraper {
     private final StationTrainScraper commonScraper;
     private final StationTrainMetadataScraper trainMetadataScraper;
 
-    public List<TrainArrivalDepartureDto> scrapeTrainArrivals(Element arrivalTable) {
+    public List<TrainArrivalDepartureDto> scrapeTrainArrivalsDepartures(Element arrivalTable) {
         return commonScraper.scrapeTableRows(arrivalTable)
                 .parallelStream()
-                .map(this::scrapeArrivalTrain)
+                .map(this::scrapeTrainArrivalDeparture)
                 .toList();
     }
 
-    public TrainArrivalDepartureDto scrapeArrivalTrain(Element row) {
+    public TrainArrivalDepartureDto scrapeTrainArrivalDeparture(Element row) {
         String arrivalTime = commonScraper.scrapeTime(row);
         String arrivalTimeLabel = commonScraper.scrapeDelayLabel(row);
         String platform = commonScraper.scrapePlatform(row);

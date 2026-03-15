@@ -1,9 +1,7 @@
 package com.stavre.cfrapiadapter.repository;
 
-import com.stavre.cfrapiadapter.adapter.EnrichedTrainArrivalAdapter;
-import com.stavre.cfrapiadapter.adapter.EnrichedTrainDepartureAdapter;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
+import com.stavre.cfrapiadapter.adapter.EnrichedTrainArrivalDepartureAdapter;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
 import com.stavre.cfrapiadapter.proxy.TrainStationProxy;
 import com.stavre.cfrapiadapter.scraper.station.StationRequestScraper;
@@ -22,10 +20,9 @@ public class StationRepository {
     private final StationRequestScraper stationRequestScraper;
     private final StationScraper scraper;
 
-    private final EnrichedTrainArrivalAdapter arrivalAdapter;
-    private final EnrichedTrainDepartureAdapter departureAdapter;
+    private final EnrichedTrainArrivalDepartureAdapter enrichedTrainArrivalDepartureAdapter;
 
-    public List<Optional<EnrichedTrainArrivalDto>> getArrivals(String stationName, String date) {
+    public List<Optional<EnrichedTrainArrivalDepartureDto>> getArrivals(String stationName, String date) {
         String response = proxy.getStationTokenPage(stationName, date);
         RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
 
@@ -33,18 +30,18 @@ public class StationRepository {
 
         return scraper.scrapeArrivals(secondResult)
                 .parallelStream()
-                .map(arrival -> arrivalAdapter.adapt(arrival, date))
+                .map(arrival -> enrichedTrainArrivalDepartureAdapter.adapt(arrival, date))
                 .toList();
     }
 
-    public List<Optional<EnrichedTrainDepartureDto>> getDepartures(String stationName, String date) {
+    public List<Optional<EnrichedTrainArrivalDepartureDto>> getDepartures(String stationName, String date) {
         String response = proxy.getStationTokenPage(stationName, date);
         RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
 
         String secondResult = proxy.getStationTrains(request);
         return scraper.scrapeDepartures(secondResult)
                 .parallelStream()
-                .map(departure -> departureAdapter.adapt(departure, date))
+                .map(departure -> enrichedTrainArrivalDepartureAdapter.adapt(departure, date))
                 .toList();
     }
 }

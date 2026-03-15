@@ -1,8 +1,7 @@
 package com.stavre.cfrapiadapter.adapter;
 
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -30,8 +29,8 @@ public class StationTrainAdapter {
      * @return optional merged EnrichedStationTrainDto
      */
     public Optional<EnrichedStationTrainDto> adapt(
-            Optional<EnrichedTrainArrivalDto> arrivalOpt,
-            Optional<EnrichedTrainDepartureDto> departureOpt) {
+            Optional<EnrichedTrainArrivalDepartureDto> arrivalOpt,
+            Optional<EnrichedTrainArrivalDepartureDto> departureOpt) {
 
         if (arrivalOpt.isEmpty() && departureOpt.isEmpty()) {
             return Optional.empty();
@@ -39,27 +38,17 @@ public class StationTrainAdapter {
 
         List<String> errors = new ArrayList<>();
 
-        EnrichedTrainArrivalDto arrival = arrivalOpt.orElse(null);
-        EnrichedTrainDepartureDto departure = departureOpt.orElse(null);
+        EnrichedTrainArrivalDepartureDto arrival = arrivalOpt.orElse(null);
+        EnrichedTrainArrivalDepartureDto departure = departureOpt.orElse(null);
 
-        // If one side is missing, add an error and fields from that side will remain null
-        if (arrival == null) {
-            errors.add("Missing arrival information");
-        }
-        if (departure == null) {
-            errors.add("Missing departure information");
-        }
+        String fromStation = arrivalOpt.map(EnrichedTrainArrivalDepartureDto::otherStation).orElse(null);
+        LocalDateTime arrivalTimestamp = arrivalOpt.map(EnrichedTrainArrivalDepartureDto::timestamp).orElse(null);
+        Duration arrivalDelay = arrivalOpt.map(EnrichedTrainArrivalDepartureDto::delay).orElse(null);
 
-        // Populate side-specific fields (null when corresponding DTO is missing)
-        String fromStation = arrival == null ? null : arrival.fromStation();
-        LocalDateTime arrivalTimestamp = arrival == null ? null : arrival.arrivalTimestamp();
-        Duration arrivalDelay = arrival == null ? null : arrival.arrivalDelay();
+        String toStation = departureOpt.map(EnrichedTrainArrivalDepartureDto::otherStation).orElse(null);
+        LocalDateTime departureTimestamp = departureOpt.map(EnrichedTrainArrivalDepartureDto::timestamp).orElse(null);
+        Duration departureDelay = departureOpt.map(EnrichedTrainArrivalDepartureDto::delay).orElse(null);
 
-        String toStation = departure == null ? null : departure.toStation();
-        LocalDateTime departureTimestamp = departure == null ? null : departure.departureTimestamp();
-        Duration departureDelay = departure == null ? null : departure.departureDelay();
-
-        // Determine common fields: stopDuration, train, platform, direction (mainStations)
         Duration stopDuration = null;
         TrainMetadataDto train = null;
         String platform = null;
@@ -97,9 +86,18 @@ public class StationTrainAdapter {
                 errors.add(String.format("Mismatched direction (mainStations): arrival=%s, departure=%s",
                         arrival.mainStations(), departure.mainStations()));
             }
-        } else {
-            // If one side is missing we cannot reliably determine common fields
-            errors.add("Cannot determine common fields because one side is missing");
+        } else if (arrival != null) {
+            stopDuration = arrival.stopDuration();
+            train = arrival.train();
+            platform = arrival.platform();
+            direction = arrival.mainStations();
+            errors.add("Missing departure information");
+        } else if (departure != null) {
+            stopDuration = departure.stopDuration();
+            train = departure.train();
+            platform = departure.platform();
+            direction = departure.mainStations();
+            errors.add("Missing arrival information");
         }
 
         EnrichedStationTrainDto result = EnrichedStationTrainDto.builder()

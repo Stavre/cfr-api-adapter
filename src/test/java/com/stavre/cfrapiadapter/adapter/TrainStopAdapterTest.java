@@ -21,7 +21,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class TrainStopAdapterTest {
+class TrainStopAdapterTest {
 
     @Mock
     private AdapterUtils utils;
@@ -36,8 +36,7 @@ public class TrainStopAdapterTest {
         var result = adapter.adapt(Optional.empty(), DATE);
 
         assertThat(result).isNotNull();
-        // EnrichedTrainStopDto has a constructor that accepts List<String> errors when scraping failed.
-        // We expect the errors list to contain the specific message from the adapter.
+
         assertThat(result.errors()).containsExactly("Could not scrape this train stop from CFR page.");
     }
 
@@ -46,7 +45,7 @@ public class TrainStopAdapterTest {
         // given
         var scraped = new TrainStopDto(
                 "14:30",               // arrivalTime
-                "+3 min (întârziere)", // arrivalTimeLabel
+                "+2 min (întârziere)", // arrivalTimeLabel
                 "14:35",               // departureTime
                 "+5 min (întârziere)", // departureTimeLabel
                 " Bucharest Nord ",    // stationName (with surrounding spaces)
@@ -64,8 +63,8 @@ public class TrainStopAdapterTest {
         when(utils.getTimestamp(DATE, "14:35", new ArrayList<>()))
                 .thenReturn(departureTs);
 
-        when(utils.getDelay("+3 min (întârziere)", new ArrayList<>()))
-                .thenReturn(Duration.ofMinutes(3));
+        when(utils.getDelay("+2 min (întârziere)", new ArrayList<>()))
+                .thenReturn(Duration.ofMinutes(2));
         when(utils.getDelay("+5 min (întârziere)", new ArrayList<>()))
                 .thenReturn(Duration.ofMinutes(5));
 
@@ -79,7 +78,7 @@ public class TrainStopAdapterTest {
         assertThat(result).isNotNull();
 
         assertThat(result.arrival()).isEqualTo(arrivalTs);
-        assertThat(result.arrivalDelay()).isEqualTo(Duration.ofMinutes(3));
+        assertThat(result.arrivalDelay()).isEqualTo(Duration.ofMinutes(2));
 
         assertThat(result.departure()).isEqualTo(departureTs);
         assertThat(result.departureDelay()).isEqualTo(Duration.ofMinutes(5));

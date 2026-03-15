@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 import java.util.List;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Component
@@ -20,16 +19,8 @@ public class TrainPageValidator {
 
         pageBody.select("script").remove();
 
-        System.out.println(pageBody);
-        System.out.println("=========================================");
-
-
-        System.out.println(pageBody.getElementsByClass("text-danger"));
-        System.out.println("=========================================");
-        System.out.println(pageBody.getElementsByClass("alert alert-warning"));
-
-        List<String> errors = Stream.of(pageBody.getElementsByClass("text-danger"), pageBody.getElementsByClass("alert"))
-                .flatMap(x -> x.stream())
+        List<String> errors = pageBody.getElementsByClass("text-danger")
+                .stream()
                 .map(Element::text)
                 .filter(error -> error != null && !error.isBlank())
                 .toList();

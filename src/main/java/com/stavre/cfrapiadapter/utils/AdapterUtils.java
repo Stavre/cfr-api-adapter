@@ -52,9 +52,7 @@ public class AdapterUtils {
             return null;
         }
 
-        return dateOpt.flatMap(d ->
-                timeOpt.map(d::atTime)
-        ).orElse(null);
+        return dateOpt.flatMap(d -> timeOpt.map(d::atTime)).orElse(null);
     }
 
     public Duration getDelay(String input, List<String> errors) {
@@ -107,5 +105,14 @@ public class AdapterUtils {
             errors.add("Could not convert label %s into duration".formatted(duration));
             return null;
         }
+    }
+
+    public String getStation(String station, List<String> errors) {
+        if (station == null || station.isBlank()) {
+            errors.add("Station is missing or empty");
+            return null;
+        }
+
+        return station;
     }
 }

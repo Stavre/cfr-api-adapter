@@ -2,8 +2,7 @@ package com.stavre.cfrapiadapter.service;
 
 import com.stavre.cfrapiadapter.adapter.StationTrainAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.response.StationDto;
 import com.stavre.cfrapiadapter.repository.StationRepository;
 import jakarta.annotation.PostConstruct;
@@ -31,9 +30,9 @@ public class StationService {
     private final StationTrainAdapter adapter;
 
     public List<EnrichedStationTrainDto> getStationTrains(String stationName, String date) {
-        List<Optional<EnrichedTrainArrivalDto>> arrivals = repository.getArrivals(stationName, date);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals = repository.getArrivals(stationName, date);
 
-        List<Optional<EnrichedTrainDepartureDto>> departures = repository.getDepartures(stationName, date);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> departures = repository.getDepartures(stationName, date);
 
         return createPairs(arrivals, departures).stream()
                 .map(pair -> adapter.adapt(pair.getKey(), pair.getValue()))
@@ -42,18 +41,19 @@ public class StationService {
                 .toList();
     }
 
-    private List<Map.Entry<Optional<EnrichedTrainArrivalDto>, Optional<EnrichedTrainDepartureDto>>> createPairs(
-            List<Optional<EnrichedTrainArrivalDto>> arrivals,
-            List<Optional<EnrichedTrainDepartureDto>> departures
+    private List<Map.Entry<Optional<EnrichedTrainArrivalDepartureDto>, Optional<EnrichedTrainArrivalDepartureDto>>>
+        createPairs(
+            List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals,
+            List<Optional<EnrichedTrainArrivalDepartureDto>> departures
     ) {
-        List<Optional<EnrichedTrainArrivalDto>> arrivalsList = new ArrayList<>(arrivals);
-        List<Optional<EnrichedTrainDepartureDto>> departuresList = new ArrayList<>(departures);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivalsList = new ArrayList<>(arrivals);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> departuresList = new ArrayList<>(departures);
 
-        List<Map.Entry<Optional<EnrichedTrainArrivalDto>, Optional<EnrichedTrainDepartureDto>>> pairs
+        List<Map.Entry<Optional<EnrichedTrainArrivalDepartureDto>, Optional<EnrichedTrainArrivalDepartureDto>>> pairs
                 = new ArrayList<>();
 
         for (var arrival : arrivalsList) {
-            Optional<EnrichedTrainDepartureDto> matchingDeparture = departuresList.stream()
+            Optional<EnrichedTrainArrivalDepartureDto> matchingDeparture = departuresList.stream()
                     .filter(d ->
                             d.isPresent() && d.get().train().equals(arrival.get().train()))
                     .findFirst()
@@ -108,7 +108,8 @@ public class StationService {
     @PostConstruct
     public void init() throws IOException {
         try (InputStream is = new ClassPathResource("stations.json").getInputStream()) {
-            stations = objectMapper.readValue(is, new TypeReference<>() {});
+            stations = objectMapper.readValue(is, new TypeReference<>() {
+            });
         }
     }
 

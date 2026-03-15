@@ -24,7 +24,7 @@ public class TrainStopsScraper {
         return page.select("ul.list-group > li.list-group-item");
     }
 
-    private Optional<TrainStopDto> scrapeTrainStop(Element row) {
+    public Optional<TrainStopDto> scrapeTrainStop(Element row) {
         try {
             String departureTime = scrapeDepartureTime(row);
             String departureTimeLabel = scrapeDepartureTimeLabel(row);

@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TrainAdapterTest {
 
+    public static final String DATE = "2024-01-10";
     @Mock
     private TrainStopAdapter trainStopAdapter;
 
@@ -42,10 +43,10 @@ class TrainAdapterTest {
         when(dto.branchStops()).thenReturn(Map.of(branch, List.of(Optional.empty())));
 
         EnrichedTrainStopDto enrichedStop = org.mockito.Mockito.mock(EnrichedTrainStopDto.class);
-        when(trainStopAdapter.adapt(any(Optional.class), eq("2024-01-10"))).thenReturn(enrichedStop);
+        when(trainStopAdapter.adapt(any(Optional.class), eq(DATE))).thenReturn(enrichedStop);
 
         // act
-        EnrichedTrainDto result = adapter.adapt(dto, "2024-01-10");
+        EnrichedTrainDto result = adapter.adapt(dto, DATE);
 
         // assert
         assertThat(result).isNotNull();
@@ -81,11 +82,11 @@ class TrainAdapterTest {
         when(adjustedStop2.arrival()).thenReturn(LocalDateTime.of(2024, 1, 11, 0, 10));
 
         // stub trainStopAdapter.adapt to return stop1 then stop2 for the two optionals
-        when(trainStopAdapter.adapt(any(Optional.class), eq("2024-01-10")))
+        when(trainStopAdapter.adapt(any(Optional.class), eq(DATE)))
                 .thenReturn(stop1, stop2);
 
         // act
-        EnrichedTrainDto result = adapter.adapt(dto, "2024-01-10");
+        EnrichedTrainDto result = adapter.adapt(dto, DATE);
 
         // assert
         List<EnrichedTrainStopDto> stops = result.stops().get(branch);

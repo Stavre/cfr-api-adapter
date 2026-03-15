@@ -2,9 +2,8 @@ package com.stavre.cfrapiadapter.dto.scraper;
 
 import lombok.Builder;
 
-
 /**
- * Class for modeling train departures and train arrivals for a station
+ * Class for modeling train departures and train arrivals for a station.
  */
 
 @Builder

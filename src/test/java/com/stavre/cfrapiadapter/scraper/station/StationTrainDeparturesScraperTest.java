@@ -18,7 +18,7 @@ class StationTrainDeparturesScraperTest {
     StationTrainMetadataScraper trainMetadataScraper = new StationTrainMetadataScraper();
     StationTrainScraper commonScraper = new StationTrainScraper();
 
-    private final StationTrainDeparturesScraper scraper = new StationTrainDeparturesScraper(commonScraper, trainMetadataScraper);
+    private final StationTrainArrivalDepartureScraper scraper = new StationTrainArrivalDepartureScraper(commonScraper, trainMetadataScraper);
 
     private Element loadElementFromFile(String filePath) throws IOException {
         String trainDepartureHtml = FileUtils.readFileToString(new File(filePath), StandardCharsets.UTF_8);
@@ -43,7 +43,7 @@ class StationTrainDeparturesScraperTest {
                 .build();
 
 
-        TrainArrivalDepartureDto actual = scraper.scrapeDepartureTrain(row);
+        TrainArrivalDepartureDto actual = scraper.scrapeTrainArrivalDeparture(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -65,7 +65,7 @@ class StationTrainDeparturesScraperTest {
                 .build();
 
 
-        TrainArrivalDepartureDto actual = scraper.scrapeDepartureTrain(row);
+        TrainArrivalDepartureDto actual = scraper.scrapeTrainArrivalDeparture(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -87,7 +87,7 @@ class StationTrainDeparturesScraperTest {
                 .build();
 
 
-        TrainArrivalDepartureDto actual = scraper.scrapeDepartureTrain(row);
+        TrainArrivalDepartureDto actual = scraper.scrapeTrainArrivalDeparture(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -109,7 +109,7 @@ class StationTrainDeparturesScraperTest {
                 .build();
 
 
-        TrainArrivalDepartureDto actual = scraper.scrapeDepartureTrain(row);
+        TrainArrivalDepartureDto actual = scraper.scrapeTrainArrivalDeparture(row);
 
         assertThat(actual).isEqualTo(expected);
     }
