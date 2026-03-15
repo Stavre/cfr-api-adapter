@@ -32,7 +32,7 @@ public class StationRepository {
         String secondResult = proxy.getStationTrains(request);
 
         return scraper.scrapeArrivals(secondResult)
-                .stream()
+                .parallelStream()
                 .map(arrival -> arrivalAdapter.adapt(arrival, date))
                 .toList();
     }
@@ -43,7 +43,7 @@ public class StationRepository {
 
         String secondResult = proxy.getStationTrains(request);
         return scraper.scrapeDepartures(secondResult)
-                .stream()
+                .parallelStream()
                 .map(departure -> departureAdapter.adapt(departure, date))
                 .toList();
     }

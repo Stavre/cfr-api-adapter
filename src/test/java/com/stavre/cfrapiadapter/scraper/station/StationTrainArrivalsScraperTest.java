@@ -1,16 +1,14 @@
 package com.stavre.cfrapiadapter.scraper.station;
 
-import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,22 +30,18 @@ class StationTrainArrivalsScraperTest {
 
         Element row = loadElementFromFile(trainDepartureFilePath);
 
-        Optional<TrainArrivalDto> trainDepartureDtoOptional = scraper.scrapeArrivalTrain(row);
-
-        assertThat(trainDepartureDtoOptional.isPresent()).isTrue();
-
-        TrainArrivalDto expected = TrainArrivalDto.builder()
-                .arrivalTime("11:36")
-                .arrivalTimeLabel("la timp")
-                .train(new TrainMetadataDto("11532", "IR", "Astra Trans Carpatic"))
+        TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
+                .time("11:36")
+                .timeLabel("la timp")
+                .train(new TrainMetadataDto("IR 11532", "11532", "IR", "Astra Trans Carpatic"))
                 .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Câmpina - Ploiești Vest - București Nord")
-                .originStation("Brașov")
+                .otherStation("Brașov")
                 .platform("linia 1")
                 .stopLabel("1 min (până la 11:37)")
                 .build();
 
 
-        TrainArrivalDto actual = trainDepartureDtoOptional.get();
+        TrainArrivalDepartureDto actual = scraper.scrapeArrivalTrain(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -58,22 +52,18 @@ class StationTrainArrivalsScraperTest {
 
         Element row = loadElementFromFile(trainDepartureFilePath);
 
-        Optional<TrainArrivalDto> trainDepartureDtoOptional = scraper.scrapeArrivalTrain(row);
-
-        assertThat(trainDepartureDtoOptional.isPresent()).isTrue();
-
-        TrainArrivalDto expected = TrainArrivalDto.builder()
-                .arrivalTime("12:43")
-                .arrivalTimeLabel("la timp*")
-                .train(new TrainMetadataDto("11534", "IR", "Astra Trans Carpatic"))
+        TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
+                .time("12:43")
+                .timeLabel("la timp*")
+                .train(new TrainMetadataDto("IR 11534", "11534", "IR", "Astra Trans Carpatic"))
                 .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Câmpina - Ploiești Vest - București Nord")
-                .originStation("Brașov")
+                .otherStation("Brașov")
                 .platform("")
                 .stopLabel("1 min (până la 12:44)")
                 .build();
 
 
-        TrainArrivalDto actual = trainDepartureDtoOptional.get();
+        TrainArrivalDepartureDto actual = scraper.scrapeArrivalTrain(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -84,22 +74,18 @@ class StationTrainArrivalsScraperTest {
 
         Element row = loadElementFromFile(trainDepartureFilePath);
 
-        Optional<TrainArrivalDto> trainDepartureDtoOptional = scraper.scrapeArrivalTrain(row);
-
-        assertThat(trainDepartureDtoOptional.isPresent()).isTrue();
-
-        TrainArrivalDto expected = TrainArrivalDto.builder()
-                .arrivalTime("11:14")
-                .arrivalTimeLabel("+2 min (întârziere)")
-                .train(new TrainMetadataDto("3002", "R-E", "CFR Călători"))
+        TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
+                .time("11:14")
+                .timeLabel("+2 min (întârziere)")
+                .train(new TrainMetadataDto("R-E 3002", "3002", "R-E", "CFR Călători"))
                 .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Breaza hc - Câmpina - Florești Prahova - Ploiești Vest - Buftea - București Nord")
-                .originStation("Brașov")
+                .otherStation("Brașov")
                 .platform("linia 3")
                 .stopLabel("2 min (până la 11:16)")
                 .build();
 
 
-        TrainArrivalDto actual = trainDepartureDtoOptional.get();
+        TrainArrivalDepartureDto actual = scraper.scrapeArrivalTrain(row);
 
         assertThat(actual).isEqualTo(expected);
     }
@@ -110,22 +96,18 @@ class StationTrainArrivalsScraperTest {
 
         Element row = loadElementFromFile(trainDepartureFilePath);
 
-        Optional<TrainArrivalDto> trainDepartureDtoOptional = scraper.scrapeArrivalTrain(row);
-
-        assertThat(trainDepartureDtoOptional.isPresent()).isTrue();
-
-        TrainArrivalDto expected = TrainArrivalDto.builder()
-                .arrivalTime("11:34")
-                .arrivalTimeLabel("la timp")
-                .train(new TrainMetadataDto("11032", "R-E", "Regio Călători"))
+        TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
+                .time("11:34")
+                .timeLabel("la timp")
+                .train(new TrainMetadataDto("R-E 11032", "11032", "R-E", "Regio Călători"))
                 .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Câmpina - Florești Prahova - Ploiești Vest - Buftea - Chitila - București Nord")
-                .originStation("Brașov")
+                .otherStation("Brașov")
                 .platform("linia 4A")
                 .stopLabel("necunoscută (stație terminus)")
                 .build();
 
 
-        TrainArrivalDto actual = trainDepartureDtoOptional.get();
+        TrainArrivalDepartureDto actual = scraper.scrapeArrivalTrain(row);
 
         assertThat(actual).isEqualTo(expected);
     }

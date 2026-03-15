@@ -1,12 +1,9 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
-import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;

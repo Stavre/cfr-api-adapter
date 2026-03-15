@@ -4,24 +4,21 @@ import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public class TrainMetadataScraper {
 
-    public Optional<TrainMetadataDto> scrapeMetadata(Element pageBody) {
-        try {
-            Element containerElement = scrapeContainerElement(pageBody);
+    public TrainMetadataDto scrapeMetadata(Element pageBody) {
 
-            String operator = scrapeTrainOperator(containerElement);
-            String category = scrapeTrainCategory(containerElement);
-            String number = scrapeTrainNumber(containerElement);
+        Element containerElement = scrapeContainerElement(pageBody);
 
-            return Optional.of(new TrainMetadataDto(number, category, operator));
-        } catch (Exception e) {
-            return Optional.empty();
-        }
+        String operator = scrapeTrainOperator(containerElement);
+        String category = scrapeTrainCategory(containerElement);
+        String number = scrapeTrainNumber(containerElement);
+        String id = getTrainId(category, number);
+
+        return new TrainMetadataDto(id, number, category, operator);
     }
 
     private Element scrapeContainerElement(Element pageBody) {
@@ -54,5 +51,9 @@ public class TrainMetadataScraper {
                 .child(1)
                 .text()
                 .trim();
+    }
+
+    private String getTrainId(String trainCategory, String trainNumber) {
+        return "%s %s".formatted(trainCategory, trainNumber);
     }
 }

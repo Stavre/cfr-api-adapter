@@ -1,6 +1,7 @@
 package com.stavre.cfrapiadapter.dto.scraper;
 
 public record TrainMetadataDto(
-        String trainNumber,
-        String trainCategory,
+        String id,
+        String number,
+        String category,
         String operator) {}

@@ -7,9 +7,12 @@ import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -17,12 +20,11 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class TrainAdapter {
-    private final TrainMetadataAdapter trainMetadataAdapter = new TrainMetadataAdapter();
     private final TrainStopAdapter trainStopAdapter;
 
     public EnrichedTrainDto adapt(TrainDto dto, String date) {
         return new EnrichedTrainDto(
-                trainMetadataAdapter.adapt(dto.metadata().get()),
+                dto.metadata(),
                 getStops(dto.branchStops(), date)
         );
     }
@@ -37,46 +39,78 @@ public class TrainAdapter {
     }
 
     private List<EnrichedTrainStopDto> getEnrichedStops(List<Optional<TrainStopDto>> stops, String date) {
-        List<EnrichedTrainStopDto> enrichedStops = stops
-                .stream()
+        if (stops == null || stops.isEmpty()) {
+            return List.of();
+        }
+
+        List<EnrichedTrainStopDto> adapted = adaptStops(stops, date);
+        return normalizeTimestamps(adapted);
+    }
+
+    private List<EnrichedTrainStopDto> adaptStops(List<Optional<TrainStopDto>> stops, String date) {
+        return stops.stream()
                 .map(stop -> trainStopAdapter.adapt(stop, date))
                 .toList();
+    }
 
-        List<EnrichedTrainStopDto> list = new ArrayList<>();
-
-        list.add(enrichedStops.getFirst());
-        for (int i = 1; i < enrichedStops.size(); i++) {
-            EnrichedTrainStopDto newStop = enrichedStops.get(i);
-            EnrichedTrainStopDto lastStop = list.get(i - 1);
-            EnrichedTrainStopDto currentStop = enrichedStops.get(i);
-
-
-            if (currentStop.arrival() != null && lastStop.arrival() != null) {
-                if (currentStop.arrival().toLocalTime().isBefore(lastStop.arrival().toLocalTime())) {
-                    LocalDateTime newTimestamp = lastStop.arrival().toLocalDate().plusDays(1)
-                            .atTime(currentStop.arrival().toLocalTime());
-                    newStop = newStop.withArrival(newTimestamp);
-                } else {
-                    LocalDateTime newTimestamp = lastStop.arrival().toLocalDate()
-                            .atTime(currentStop.arrival().toLocalTime());
-                    newStop = newStop.withArrival(newTimestamp);
-                }
-            }
-
-            if (currentStop.departure() != null && lastStop.departure() != null) {
-                if (currentStop.departure().toLocalTime().isBefore(lastStop.departure().toLocalTime())) {
-                    LocalDateTime newTimestamp = lastStop.departure().toLocalDate()
-                            .plusDays(1).atTime(currentStop.departure().toLocalTime());
-                    newStop = newStop.withDeparture(newTimestamp);
-                } else {
-                    LocalDateTime newTimestamp = lastStop.departure().toLocalDate()
-                            .atTime(currentStop.departure().toLocalTime());
-                    newStop = newStop.withDeparture(newTimestamp);
-                }
-            }
-
-            list.add(newStop);
+    private List<EnrichedTrainStopDto> normalizeTimestamps(List<EnrichedTrainStopDto> enrichedStops) {
+        if (enrichedStops == null || enrichedStops.isEmpty()) {
+            return List.of();
         }
-        return list;
+
+        List<EnrichedTrainStopDto> result = new ArrayList<>(enrichedStops.size());
+        result.add(enrichedStops.get(0));
+
+        for (int i = 1; i < enrichedStops.size(); i++) {
+            EnrichedTrainStopDto previous = result.get(result.size() - 1);
+            EnrichedTrainStopDto current = enrichedStops.get(i);
+
+            current = adjustArrival(previous, current);
+            current = adjustDeparture(previous, current);
+
+            result.add(current);
+        }
+
+        return result;
+    }
+
+    private EnrichedTrainStopDto adjustArrival(EnrichedTrainStopDto previous, EnrichedTrainStopDto current) {
+        LocalDateTime prevArrival = previous == null ? null : previous.arrival();
+        LocalDateTime currArrival = current == null ? null : current.arrival();
+
+        LocalDateTime adjusted = adjustTimestamp(prevArrival, currArrival);
+        if (adjusted != null && !Objects.equals(adjusted, currArrival)) {
+            return current.withArrival(adjusted);
+        }
+        return current;
+    }
+
+    private EnrichedTrainStopDto adjustDeparture(EnrichedTrainStopDto previous, EnrichedTrainStopDto current) {
+        LocalDateTime prevDeparture = previous == null ? null : previous.departure();
+        LocalDateTime currDeparture = current == null ? null : current.departure();
+
+        LocalDateTime adjusted = adjustTimestamp(prevDeparture, currDeparture);
+        if (adjusted != null && !Objects.equals(adjusted, currDeparture)) {
+            return current.withDeparture(adjusted);
+        }
+        return current;
+    }
+
+    private LocalDateTime adjustTimestamp(LocalDateTime previous, LocalDateTime current) {
+        if (current == null) {
+            return null;
+        }
+        if (previous == null) {
+            return current;
+        }
+
+        LocalTime prevTime = previous.toLocalTime();
+        LocalTime currTime = current.toLocalTime();
+        LocalDate baseDate = previous.toLocalDate();
+
+        return currTime.isBefore(prevTime)
+                ? baseDate.plusDays(1).atTime(currTime)
+                : baseDate.atTime(currTime);
+
     }
 }

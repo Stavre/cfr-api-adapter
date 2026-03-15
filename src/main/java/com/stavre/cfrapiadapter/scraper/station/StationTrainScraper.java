@@ -2,7 +2,6 @@ package com.stavre.cfrapiadapter.scraper.station;
 
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
-
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;

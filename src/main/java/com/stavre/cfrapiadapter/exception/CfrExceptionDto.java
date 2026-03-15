@@ -2,8 +2,7 @@ package com.stavre.cfrapiadapter.exception;
 
 import java.util.List;
 
-public record CFRExceptionDto(
+public record CfrExceptionDto(
         String message,
         List<String> errors
-) {
-}
+) {}

@@ -36,4 +36,8 @@ public class DateTimeUtils {
             return Optional.empty();
         }
     }
+
+    public String getDateOrGetToday(String inputDate) {
+        return inputDate == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : inputDate;
+    }
 }

@@ -3,7 +3,7 @@ package com.stavre.cfrapiadapter.adapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDepartureDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainMetadataDto;
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import java.time.Duration;
@@ -61,7 +61,7 @@ public class StationTrainAdapter {
 
         // Determine common fields: stopDuration, train, platform, direction (mainStations)
         Duration stopDuration = null;
-        EnrichedTrainMetadataDto train = null;
+        TrainMetadataDto train = null;
         String platform = null;
         List<String> direction = null;
 
@@ -118,5 +118,4 @@ public class StationTrainAdapter {
 
         return Optional.of(result);
     }
-
 }

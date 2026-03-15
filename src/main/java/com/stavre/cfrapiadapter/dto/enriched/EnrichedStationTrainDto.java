@@ -1,5 +1,6 @@
 package com.stavre.cfrapiadapter.dto.enriched;
 
+import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import lombok.Builder;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ public record EnrichedStationTrainDto(
         Duration departureDelay,
 
         Duration stopDuration,
-        EnrichedTrainMetadataDto train,
+        TrainMetadataDto train,
         String platform,
         List<String> direction,
         List<String> errors

@@ -5,6 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public record TrainDto(
-        Optional<TrainMetadataDto> metadata,
+        TrainMetadataDto metadata,
         Map<TrainBranchDto, List<Optional<TrainStopDto>>> branchStops
 ) {}
