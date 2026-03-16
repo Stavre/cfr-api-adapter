@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,9 +22,9 @@ public class StationArrivalsController {
     @GetMapping("/delayed/{stationName}")
     public List<EnrichedStationTrainDto> getDelayedArrivals(
             @PathVariable String stationName,
-            @RequestParam(value = "date", required = false) String input
+            @RequestParam(value = "date", required = false) String inputDate
     ) {
-        String date = input == null ? LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) : input;
+        String date = dateTimeUtils.getDateOrGetToday(inputDate);
         List<EnrichedStationTrainDto> arrivals = service.getStationTrains(stationName, date);
 
         return service.getDelayedArrivals(arrivals);

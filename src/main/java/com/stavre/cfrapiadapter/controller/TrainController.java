@@ -20,8 +20,9 @@ public class TrainController {
 
     @GetMapping("/train/{trainNumber}")
     public EnrichedTrainDto getTrainTimeTable(@PathVariable String trainNumber,
-                                              @RequestParam(required = false) String date) {
+                                              @RequestParam(value = "date", required = false) String inputDate) {
 
+        String date = dateTimeUtils.getDateOrGetToday(inputDate);
         return service.getTrainStops(trainNumber, date);
     }
 
@@ -29,6 +30,7 @@ public class TrainController {
     public TrainDelayResponseDto getTrainDelay(@PathVariable String trainId,
                                                @RequestParam(value = "date", required = false) String inputDate,
                                                @RequestParam(required = false) String station) {
+
         String date = dateTimeUtils.getDateOrGetToday(inputDate);
 
         EnrichedTrainDto trainDto = service.getTrainStops(trainId, date);

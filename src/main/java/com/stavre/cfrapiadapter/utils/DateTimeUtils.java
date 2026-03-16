@@ -4,20 +4,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 import java.util.Optional;
 
 @Component
 public class DateTimeUtils {
-
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("dd.MM.uuuu")
-                    .withResolverStyle(ResolverStyle.STRICT);
-
-    public String getCurrentDate() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        return LocalDate.now().format(formatter);
-    }
 
     public Optional<LocalTime> convertTime(String time) {
         try {
