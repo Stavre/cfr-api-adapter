@@ -1,5 +1,7 @@
 package com.stavre.cfrapiadapter.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
@@ -9,13 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class EnrichedTrainArrivalDepartureAdapterTest {
@@ -24,7 +25,16 @@ class EnrichedTrainArrivalDepartureAdapterTest {
     public static final String MAIN_STATIONS = "stationA-stationB";
     public static final String PLATFORM = "linia 2";
     public static final String DATE = "10.01.2024";
-    public static final TrainMetadataDto TRAIN_METADATA_DTO = new TrainMetadataDto("id", "number", "category", "operator");
+    public static final TrainMetadataDto TRAIN_METADATA_DTO = TrainMetadataDto.builder()
+                                                                                .id("id")
+                                                                                .number("number")
+                                                                                .category("category")
+                                                                                .operator("operator")
+                                                                                .build();
+    public static final String LA_TIMP = "la timp*";
+    public static final String OTHER_STATION = "Curtici";
+    public static final String TIME = "19:30";
+    public static final List<String> STATIONS = List.of("stationA", "stationB");
 
     private final DateTimeUtils dateTimeUtils = new DateTimeUtils();
     private final AdapterUtils adapterUtils = new AdapterUtils(dateTimeUtils);
@@ -82,10 +92,10 @@ class EnrichedTrainArrivalDepartureAdapterTest {
     void testAdapt_withFullData() {
         // Arrange
         TrainArrivalDepartureDto arrival = TrainArrivalDepartureDto.builder()
-                .time("19:30")
-                .timeLabel("la timp*")
+                .time(TIME)
+                .timeLabel(LA_TIMP)
                 .platform(PLATFORM)
-                .otherStation("Curtici")
+                .otherStation(OTHER_STATION)
                 .train(TRAIN_METADATA_DTO)
                 .mainStations(MAIN_STATIONS)
                 .stopLabel(STOP_LABEL)
@@ -93,10 +103,10 @@ class EnrichedTrainArrivalDepartureAdapterTest {
 
         Optional<EnrichedTrainArrivalDepartureDto> expected = Optional.of(
                 EnrichedTrainArrivalDepartureDto.builder()
-                        .timestamp(LocalDate.of(2024,1, 10).atTime(19, 30))
+                        .timestamp(LocalDate.of(2024, 1, 10).atTime(19, 30))
                         .delay(Duration.ofMinutes(0))
                         .platform("2")
-                        .otherStation("Curtici")
+                        .otherStation(OTHER_STATION)
                         .train(TRAIN_METADATA_DTO)
                         .mainStations(Arrays.stream(MAIN_STATIONS.split("-")).toList())
                         .stopDuration(Duration.ofMinutes(2))
@@ -117,7 +127,7 @@ class EnrichedTrainArrivalDepartureAdapterTest {
                 .time("5:30")
                 .timeLabel("")
                 .platform(PLATFORM)
-                .otherStation("Curtici")
+                .otherStation(OTHER_STATION)
                 .train(TRAIN_METADATA_DTO)
                 .mainStations("stationA - stationB")
                 .stopLabel(STOP_LABEL)
@@ -125,12 +135,12 @@ class EnrichedTrainArrivalDepartureAdapterTest {
 
         Optional<EnrichedTrainArrivalDepartureDto> expected = Optional.of(
                 EnrichedTrainArrivalDepartureDto.builder()
-                        .timestamp(LocalDate.of(2024,1, 10).atTime(5, 30))
+                        .timestamp(LocalDate.of(2024, 1, 10).atTime(5, 30))
                         .delay(null)
                         .platform("2")
-                        .otherStation("Curtici")
+                        .otherStation(OTHER_STATION)
                         .train(TRAIN_METADATA_DTO)
-                        .mainStations(List.of("stationA", "stationB"))
+                        .mainStations(STATIONS)
                         .stopDuration(Duration.ofMinutes(2))
                         .build()
         );
@@ -146,10 +156,10 @@ class EnrichedTrainArrivalDepartureAdapterTest {
     void testAdapt_withEmptyPlatform() {
         // Arrange
         TrainArrivalDepartureDto arrival = TrainArrivalDepartureDto.builder()
-                .time("19:30")
-                .timeLabel("la timp*")
+                .time(TIME)
+                .timeLabel(LA_TIMP)
                 .platform("")
-                .otherStation("Curtici")
+                .otherStation(OTHER_STATION)
                 .train(TRAIN_METADATA_DTO)
                 .mainStations(MAIN_STATIONS)
                 .stopLabel(STOP_LABEL)
@@ -157,12 +167,12 @@ class EnrichedTrainArrivalDepartureAdapterTest {
 
         Optional<EnrichedTrainArrivalDepartureDto> expected = Optional.of(
                 EnrichedTrainArrivalDepartureDto.builder()
-                        .timestamp(LocalDate.of(2024,1, 10).atTime(19, 30))
+                        .timestamp(LocalDate.of(2024, 1, 10).atTime(19, 30))
                         .delay(Duration.ofMinutes(0))
                         .platform(null)
-                        .otherStation("Curtici")
+                        .otherStation(OTHER_STATION)
                         .train(TRAIN_METADATA_DTO)
-                        .mainStations(List.of("stationA", "stationB"))
+                        .mainStations(STATIONS)
                         .stopDuration(Duration.ofMinutes(2))
                         .build()
         );
@@ -180,10 +190,10 @@ class EnrichedTrainArrivalDepartureAdapterTest {
         // Arrange
 
         TrainArrivalDepartureDto arrival = TrainArrivalDepartureDto.builder()
-                .time("19:30")
-                .timeLabel("la timp*")
+                .time(TIME)
+                .timeLabel(LA_TIMP)
                 .platform(PLATFORM)
-                .otherStation("Curtici")
+                .otherStation(OTHER_STATION)
                 .train(TRAIN_METADATA_DTO)
                 .mainStations(MAIN_STATIONS)
                 .stopLabel(STOP_LABEL)
@@ -191,12 +201,12 @@ class EnrichedTrainArrivalDepartureAdapterTest {
 
         Optional<EnrichedTrainArrivalDepartureDto> expected = Optional.of(
                 EnrichedTrainArrivalDepartureDto.builder()
-                        .timestamp(LocalDate.of(2024,1, 10).atTime(19, 30))
+                        .timestamp(LocalDate.of(2024, 1, 10).atTime(19, 30))
                         .delay(Duration.ofMinutes(0))
                         .platform("2")
-                        .otherStation("Curtici")
+                        .otherStation(OTHER_STATION)
                         .train(TRAIN_METADATA_DTO)
-                        .mainStations(List.of("stationA", "stationB"))
+                        .mainStations(STATIONS)
                         .stopDuration(Duration.ofMinutes(2))
                         .build()
         );
@@ -213,10 +223,10 @@ class EnrichedTrainArrivalDepartureAdapterTest {
     void testAdapt_withNullPlatform() {
         // Arrange
         TrainArrivalDepartureDto arrival = TrainArrivalDepartureDto.builder()
-                .time("19:30")
-                .timeLabel("la timp*")
+                .time(TIME)
+                .timeLabel(LA_TIMP)
                 .platform(null)
-                .otherStation("Curtici")
+                .otherStation(OTHER_STATION)
                 .train(TRAIN_METADATA_DTO)
                 .mainStations(MAIN_STATIONS)
                 .stopLabel(STOP_LABEL)
@@ -224,12 +234,12 @@ class EnrichedTrainArrivalDepartureAdapterTest {
 
         Optional<EnrichedTrainArrivalDepartureDto> expected = Optional.of(
                 EnrichedTrainArrivalDepartureDto.builder()
-                        .timestamp(LocalDate.of(2024,1, 10).atTime(19, 30))
+                        .timestamp(LocalDate.of(2024, 1, 10).atTime(19, 30))
                         .delay(Duration.ofMinutes(0))
                         .platform(null)
-                        .otherStation("Curtici")
+                        .otherStation(OTHER_STATION)
                         .train(TRAIN_METADATA_DTO)
-                        .mainStations(List.of("stationA", "stationB"))
+                        .mainStations(STATIONS)
                         .stopDuration(Duration.ofMinutes(2))
                         .build()
         );

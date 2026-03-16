@@ -1,5 +1,7 @@
 package com.stavre.cfrapiadapter.scraper.train;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
 import org.apache.commons.io.FileUtils;
@@ -11,8 +13,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class TrainStopsScraperTest {
     public static final String LA_TIMP = "la timp*";
@@ -30,7 +30,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("")
                 .arrivalTimeLabel("")
                 .departureTime("19:39")
@@ -40,14 +41,14 @@ class TrainStopsScraperTest {
                 .km("km 0")
                 .stopDuration("")
                 .platform("")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -57,7 +58,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("19:51")
                 .arrivalTimeLabel(LA_TIMP)
                 .departureTime("")
@@ -67,14 +69,14 @@ class TrainStopsScraperTest {
                 .km("km 17")
                 .stopDuration("")
                 .platform("")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -84,7 +86,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("2:53")
                 .arrivalTimeLabel(LA_TIMP)
                 .departureTime("2:55")
@@ -94,14 +97,14 @@ class TrainStopsScraperTest {
                 .km("km 303")
                 .stopDuration("2 min oprire")
                 .platform("")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -111,7 +114,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("8:21")
                 .arrivalTimeLabel("la timp")
                 .departureTime("8:23")
@@ -121,14 +125,14 @@ class TrainStopsScraperTest {
                 .km("km 156")
                 .stopDuration("2 min oprire")
                 .platform("linia 2")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -138,7 +142,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("19:51")
                 .arrivalTimeLabel(LA_TIMP)
                 .departureTime("20:09")
@@ -148,14 +153,14 @@ class TrainStopsScraperTest {
                 .km("km 17")
                 .stopDuration("18 min oprire")
                 .platform("")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -165,7 +170,8 @@ class TrainStopsScraperTest {
         Element row = loadElementFromFile(trainStopsFilePath);
 
         // Define expected TrainStopDto
-        TrainStopDto expectedTrainStopDto = TrainStopDto.builder()
+        Optional<TrainStopDto> expected = Optional.of(
+                TrainStopDto.builder()
                 .arrivalTime("7:03")
                 .arrivalTimeLabel("+19 min (întârziere)")
                 .departureTime("7:04")
@@ -175,13 +181,13 @@ class TrainStopsScraperTest {
                 .km("km 100")
                 .stopDuration("1 min oprire")
                 .platform("linia 3")
-                .build();
+                .build()
+        );
 
         // Scrape the train stop
         Optional<TrainStopDto> actual = scraper.scrapeTrainStop(row);
 
         // Verify the scraped data
-        assertThat(actual).isPresent();
-        assertThat(actual.get()).isEqualTo(expectedTrainStopDto);
+        assertThat(actual).isEqualTo(expected);
     }
 }

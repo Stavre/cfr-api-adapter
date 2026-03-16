@@ -1,6 +1,7 @@
 package com.stavre.cfrapiadapter.service;
 
 import com.stavre.cfrapiadapter.adapter.TrainAdapter;
+import com.stavre.cfrapiadapter.adapter.TrainTimestampAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
@@ -15,7 +16,6 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,30 +28,29 @@ public class TrainService {
     private List<String> trains;
     private final TrainRepository trainRepository;
     private final TrainAdapter trainAdapter;
+    private final TrainTimestampAdapter timestampAdapter;
 
     public EnrichedTrainDto getTrainStops(String trainId, String date) {
         TrainDto scraped = trainRepository.getTrainStops(trainId, date);
-        return trainAdapter.adapt(scraped, date);
+        var enrichedTrain = trainAdapter.adapt(scraped, date);
+        return timestampAdapter.accountForMultipleDayJourney(enrichedTrain);
     }
 
-    public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train, String date) {
+    public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train) {
 
-        LocalDateTime requestedAt = LocalDateTime.now();
         Map<TrainBranchDto, EnrichedTrainStopDto> branchStops = train.stops()
                 .entrySet().stream()
                 .map(s -> Map.entry(s.getKey(), s.getValue().getLast()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         return new TrainDelayResponseDto(
-                requestedAt,
-                date,
                 train.metadata(),
                 branchStops
         );
     }
 
-    public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train, String date, String stationName) {
-        LocalDateTime requestedAt = LocalDateTime.now();
+    public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train, String stationName) {
+
         Map<TrainBranchDto, EnrichedTrainStopDto> branchStops = train.stops()
                 .entrySet().stream()
                 .filter(s -> s.getValue().stream().anyMatch(stop -> stop.station().equals(stationName)))
@@ -63,8 +62,6 @@ public class TrainService {
                 )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         return new TrainDelayResponseDto(
-                requestedAt,
-                date,
                 train.metadata(),
                 branchStops
         );

@@ -33,10 +33,10 @@ public class TrainController {
 
         EnrichedTrainDto trainDto = service.getTrainStops(trainId, date);
         if (station == null) {
-            return service.getTrainDelay(trainDto, date);
+            return service.getTrainDelay(trainDto);
         }
 
-        return service.getTrainDelay(trainDto, date, station);
+        return service.getTrainDelay(trainDto, station);
     }
 
     @GetMapping("/train/all")

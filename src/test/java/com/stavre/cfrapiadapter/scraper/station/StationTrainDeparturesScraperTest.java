@@ -1,24 +1,23 @@
 package com.stavre.cfrapiadapter.scraper.station;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.stavre.cfrapiadapter.dto.scraper.TrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.junit.jupiter.api.Test;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 class StationTrainDeparturesScraperTest {
     StationTrainMetadataScraper trainMetadataScraper = new StationTrainMetadataScraper();
     StationTrainScraper commonScraper = new StationTrainScraper();
 
-    private final StationTrainArrivalDepartureScraper scraper = new StationTrainArrivalDepartureScraper(commonScraper, trainMetadataScraper);
+    private final StationTrainArrivalDepartureScraper scraper =
+            new StationTrainArrivalDepartureScraper(commonScraper, trainMetadataScraper);
 
     private Element loadElementFromFile(String filePath) throws IOException {
         String trainDepartureHtml = FileUtils.readFileToString(new File(filePath), StandardCharsets.UTF_8);

@@ -1,11 +1,16 @@
 package com.stavre.cfrapiadapter.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,13 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class AdapterUtilsTest {
 
     public static final String DATE = "10.01.2024";
+    public static final String TIME = "14:30";
+    public static final String DATE1 = "10.02.2024";
+    public static final String COULD_NOT_COMPUTE_TIMESTAMP = "Could not compute timestamp";
     @Mock
     private DateTimeUtils dateTimeUtils;
 
@@ -30,25 +35,20 @@ class AdapterUtilsTest {
     private static final String PLATFORM_STRING_IS_NULL_OR_BLANK = "Platform string is null or blank.";
 
     @Test
-    void shouldReturnNullAndAddError_WhenInputIsNull() {
+    void shouldReturnNull_WhenInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform(null, errors);
 
         assertThat(result).isNull();
-        assertThat(errors)
-                .hasSize(1)
-                .first()
-                .isEqualTo(PLATFORM_STRING_IS_NULL_OR_BLANK);
     }
 
     @Test
-    void shouldReturnNullAndAddError_WhenInputIsBlank() {
+    void shouldAddError_WhenInputIsNull() {
         List<String> errors = new ArrayList<>();
 
-        String result = utils.getTrainPlatform("   ", errors);
+        utils.getTrainPlatform(null, errors);
 
-        assertThat(result).isNull();
         assertThat(errors)
                 .hasSize(1)
                 .first()
@@ -56,12 +56,42 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNullAndAddError_WhenFormatDoesNotMatch() {
+    void shouldReturnNull_WhenInputIsBlank() {
+        List<String> errors = new ArrayList<>();
+
+        String result = utils.getTrainPlatform("  ", errors);
+
+        assertThat(result).isNull();
+
+    }
+
+    @Test
+    void shouldAddError_WhenInputIsBlank() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getTrainPlatform("   ", errors);
+
+        assertThat(errors)
+                .hasSize(1)
+                .first()
+                .isEqualTo(PLATFORM_STRING_IS_NULL_OR_BLANK);
+    }
+
+    @Test
+    void shouldReturnNull_WhenFormatDoesNotMatch() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("Linia 4A", errors); // wrong case
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldAddError_WhenFormatDoesNotMatch() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getTrainPlatform("Linia 4A", errors); // wrong case
+
         assertThat(errors)
                 .hasSize(1)
                 .first()
@@ -75,6 +105,14 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform("linia 4A", errors);
 
         assertThat(result).isEqualTo("4A");
+    }
+
+    @Test
+    void shouldNotAddError_WhenFormatIsValid() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getTrainPlatform("linia 4A", errors);
+
         assertThat(errors).isEmpty();
     }
 
@@ -85,62 +123,36 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform("  linia    X123   ", errors);
 
         assertThat(result).isEqualTo("X123");
+    }
+
+    @Test
+    void shouldNotAddError_WhenExtraSpacesArePresent() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getTrainPlatform("  linia    X123   ", errors);
+
         assertThat(errors).isEmpty();
     }
 
     @Test
-    void shouldReturnNullAndAddError_WhenNothingAfterLinia() {
+    void shouldReturnNull_WhenNothingAfterLinia() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("linia ", errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldAddError_WhenNothingAfterLinia() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getTrainPlatform("linia ", errors);
+
         assertThat(errors)
                 .hasSize(1)
                 .first()
                 .isEqualTo("Platform string does not match expected format: linia ");
-    }
-
-
-    @Test
-    void shouldReturnNullAndAddErrors_whenDateCannotBeConverted() {
-        List<String> errors = new ArrayList<>();
-
-        when(dateTimeUtils.convertDate("bad-date")).thenReturn(Optional.empty());
-
-        LocalDateTime result = utils.getTimestamp("bad-date", "10:30", errors);
-
-        assertThat(result).isNull();
-        assertThat(errors)
-                .containsExactly(
-                        "Could not convert date bad-date to date object",
-                        "Could not compute timestamp"
-                );
-
-        verify(dateTimeUtils).convertDate("bad-date");
-        verify(dateTimeUtils, never()).convertTime(anyString());
-    }
-
-    @Test
-    void shouldReturnNullAndAddErrors_whenTimeCannotBeConverted() {
-        List<String> errors = new ArrayList<>();
-
-        when(dateTimeUtils.convertDate(DATE))
-                .thenReturn(Optional.of(LocalDate.of(2024, 1, 10)));
-        when(dateTimeUtils.convertTime("bad-time"))
-                .thenReturn(Optional.empty());
-
-        LocalDateTime result = utils.getTimestamp(DATE, "bad-time", errors);
-
-        assertThat(result).isNull();
-        assertThat(errors)
-                .containsExactly(
-                        "Could not convert time bad-time to time object",
-                        "Could not compute timestamp"
-                );
-
-        verify(dateTimeUtils).convertDate(DATE);
-        verify(dateTimeUtils).convertTime("bad-time");
     }
 
     @Test
@@ -150,37 +162,64 @@ class AdapterUtilsTest {
         LocalDate date = LocalDate.of(2024, 2, 10);
         LocalTime time = LocalTime.of(14, 30);
 
-        when(dateTimeUtils.convertDate("10.02.2024")).thenReturn(Optional.of(date));
-        when(dateTimeUtils.convertTime("14:30")).thenReturn(Optional.of(time));
+        when(dateTimeUtils.convertDate(DATE1)).thenReturn(Optional.of(date));
+        when(dateTimeUtils.convertTime(TIME)).thenReturn(Optional.of(time));
 
-        LocalDateTime result = utils.getTimestamp("10.02.2024", "14:30", errors);
+        LocalDateTime result = utils.getTimestamp(DATE1, TIME, errors);
 
         assertThat(result).isEqualTo(LocalDateTime.of(2024, 2, 10, 14, 30));
-        assertThat(errors).isEmpty();
-
-        verify(dateTimeUtils).convertDate("10.02.2024");
-        verify(dateTimeUtils).convertTime("14:30");
     }
 
+    @Test
+    void shouldNotAddError_whenDateAndTimeAreValid() {
+        List<String> errors = new ArrayList<>();
+
+        LocalDate date = LocalDate.of(2024, 2, 10);
+        LocalTime time = LocalTime.of(14, 30);
+
+        when(dateTimeUtils.convertDate(DATE1)).thenReturn(Optional.of(date));
+        when(dateTimeUtils.convertTime(TIME)).thenReturn(Optional.of(time));
+
+        utils.getTimestamp(DATE1, TIME, errors);
+
+        assertThat(errors).isEmpty();
+    }
 
     @Test
-    void shouldReturnNullAndAddError_whenInputIsNull() {
+    void shouldReturnNull_whenInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay(null, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void shouldAddError_whenInputIsNull() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay(null, errors);
+
         assertThat(errors)
                 .containsExactly("Delay string is null or blank");
     }
 
     @Test
-    void shouldReturnNullAndAddError_whenInputIsBlank() {
+    void shouldReturnNull_whenInputIsBlank() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("  ", errors);
 
         assertThat(result).isNull();
+
+    }
+
+    @Test
+    void shouldAddError_whenInputIsBlank() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("  ", errors);
+
         assertThat(errors)
                 .containsExactly("Delay string is null or blank");
     }
@@ -192,6 +231,14 @@ class AdapterUtilsTest {
         Duration result = utils.getDelay("la timp", errors);
 
         assertThat(result).isEqualTo(Duration.ZERO);
+    }
+
+    @Test
+    void shouldNotAddError_whenInputIsLaTimp() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("la timp", errors);
+
         assertThat(errors).isEmpty();
     }
 
@@ -202,6 +249,14 @@ class AdapterUtilsTest {
         Duration result = utils.getDelay("la timp*", errors);
 
         assertThat(result).isEqualTo(Duration.ZERO);
+    }
+
+    @Test
+    void shouldNotAddError_whenInputIsLaTimpWithAsterisk() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("la timp*", errors);
+
         assertThat(errors).isEmpty();
     }
 
@@ -212,6 +267,14 @@ class AdapterUtilsTest {
         Duration result = utils.getDelay("+7 min (întârziere)", errors);
 
         assertThat(result).isEqualTo(Duration.ofMinutes(7));
+    }
+
+    @Test
+    void shouldNotAddError_whenValidDelayString() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("+7 min (întârziere)", errors);
+
         assertThat(errors).isEmpty();
     }
 
@@ -222,42 +285,55 @@ class AdapterUtilsTest {
         Duration result = utils.getDelay("+3 min (întârziere)*", errors);
 
         assertThat(result).isEqualTo(Duration.ofMinutes(3));
+    }
+
+    @Test
+    void shouldNotAddError_whenValidDelayStringWithAsterisk() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("+3 min (întârziere)*", errors);
+
         assertThat(errors).isEmpty();
     }
 
     @Test
-    void shouldReturnNullAndAddError_whenMissingSpaceBeforeMin() {
+    void shouldReturnNull_whenMissingSpaceBeforeMin() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("+5min", errors);
 
         assertThat(result).isNull();
+
+    }
+
+    @Test
+    void shouldAddError_whenMissingSpaceBeforeMin() {
+        List<String> errors = new ArrayList<>();
+
+        utils.getDelay("+5min", errors);
+
         assertThat(errors)
                 .containsExactly("Could not extract delay from string: +5min");
     }
 
     @Test
-    void shouldReturnNullAndAddError_whenInvalidFormat() {
+    void shouldReturnNull_whenInvalidFormat() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("random text", errors);
 
         assertThat(result).isNull();
-        assertThat(errors)
-                .containsExactly("Could not extract delay from string: random text");
+
     }
 
     @Test
-    void getTrainPlatform_withValidPlatformString() {
-        AdapterUtils utils = new AdapterUtils(null);
+    void shouldAddError_whenInvalidFormat() {
+        List<String> errors = new ArrayList<>();
 
-        String platform = "linia 2";
-        List<String> errors = mock(List.class);
+        utils.getDelay("random text", errors);
 
-        String result = utils.getTrainPlatform(platform, errors);
-
-        assertThat(result).isEqualTo("2");
-        verifyNoInteractions(errors);
+        assertThat(errors)
+                .containsExactly("Could not extract delay from string: random text");
     }
 
     @Test
@@ -270,11 +346,22 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform(platform, errors);
 
         assertThat(result).isEqualTo("2A");
+    }
+
+    @Test
+    void getTrainPlatformDoesNotAddError_withValidComplexPlatformString() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String platform = "linia 2A";
+        List<String> errors = mock(List.class);
+
+        utils.getTrainPlatform(platform, errors);
+
         verifyNoInteractions(errors);
     }
 
     @Test
-    void getTrainPlatform_withNullPlatformString() {
+    void getTrainPlatformReturnNull_withNullPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = null;
@@ -283,11 +370,22 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform(platform, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getTrainPlatformAddError_withNullPlatformString() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String platform = null;
+        List<String> errors = mock(List.class);
+
+        utils.getTrainPlatform(platform, errors);
+
         verify(errors).add(PLATFORM_STRING_IS_NULL_OR_BLANK);
     }
 
     @Test
-    void getTrainPlatform_withBlankPlatformString() {
+    void getTrainPlatformReturnNull_withBlankPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = " ";
@@ -296,11 +394,22 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform(platform, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getTrainPlatformAddError_withBlankPlatformString() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String platform = " ";
+        List<String> errors = mock(List.class);
+
+        utils.getTrainPlatform(platform, errors);
+
         verify(errors).add(PLATFORM_STRING_IS_NULL_OR_BLANK);
     }
 
     @Test
-    void getTrainPlatform_withInvalidFormat() {
+    void getTrainPlatformReturnNull_withInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = "linia2";
@@ -309,6 +418,17 @@ class AdapterUtilsTest {
         String result = utils.getTrainPlatform(platform, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getTrainPlatformAddError_withInvalidFormat() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String platform = "linia2";
+        List<String> errors = mock(List.class);
+
+        utils.getTrainPlatform(platform, errors);
+
         verify(errors).add("Platform string does not match expected format: linia2");
     }
 
@@ -316,38 +436,69 @@ class AdapterUtilsTest {
     void getTimestamp_withValidDateAndTime() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
-        String date = DATE;
         String time = "19:30";
 
-        LocalDateTime result = utils.getTimestamp(date, time, mock(List.class));
+        LocalDateTime result = utils.getTimestamp(DATE, time, mock(List.class));
 
         assertThat(result).isEqualTo(LocalDateTime.of(2024, 1, 10, 19, 30));
     }
 
     @Test
-    void getTimestamp_withInvalidDate() {
+    void getTimestampReturnNull_withInvalidDate() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String date = "invalid-date";
         String time = "19:30";
 
-        LocalDateTime result = utils.getTimestamp(date, time, mock(List.class));
+        List<String> errors = mock(List.class);
+        LocalDateTime result = utils.getTimestamp(date, time, errors);
 
         assertThat(result).isNull();
-        verifyNoInteractions(mock(List.class));
     }
 
     @Test
-    void getTimestamp_withInvalidTime() {
+    void getTimestampAddError_withInvalidDate() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
-        String date = "2024-01-10";
+        String date = "invalid-date";
+        String time = "19:30";
+
+        List<String> errors = new ArrayList<>();
+        utils.getTimestamp(date, time, errors);
+
+        assertThat(errors).containsAll(List.of(
+                "Could not convert date invalid-date to date object",
+                COULD_NOT_COMPUTE_TIMESTAMP
+        ));
+    }
+
+    @Test
+    void getTimestampReturnNull_withInvalidTime() {
+        AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
+
+        String date = "10.01.2024";
         String time = "invalid-time";
 
-        LocalDateTime result = utils.getTimestamp(date, time, mock(List.class));
+        List<String> errors = mock(List.class);
+        LocalDateTime result = utils.getTimestamp(date, time, errors);
 
         assertThat(result).isNull();
-        verifyNoInteractions(mock(List.class));
+    }
+
+    @Test
+    void getTimestampAddErrors_withInvalidTime() {
+        AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
+
+        String date = "10.01.2024";
+        String time = "invalid-time";
+
+        List<String> errors = new ArrayList<>();
+        utils.getTimestamp(date, time, errors);
+
+        assertThat(errors).containsAll(List.of(
+                "Could not convert time invalid-time to time object",
+                COULD_NOT_COMPUTE_TIMESTAMP
+        ));
     }
 
     @Test
@@ -363,7 +514,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelay_withValidButEmptyInput() {
+    void getDelayReturnNull_withEmptyInput() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "";
@@ -372,6 +523,17 @@ class AdapterUtilsTest {
         Duration result = utils.getDelay(input, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getDelayAddError_withEmptyInput() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String input = "";
+        List<String> errors = mock(List.class);
+
+        utils.getDelay(input, errors);
+
         verify(errors).add("Delay string is null or blank");
     }
 
@@ -388,15 +550,26 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelay_withInvalidFormat() {
+    void getDelayReturnNull_withInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
-        String input = "invalid-format";
+        String input = "invalid format";
         List<String> errors = mock(List.class);
 
         Duration result = utils.getDelay(input, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getDelayAddError_withInvalidFormat() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String input = "invalid-format";
+        List<String> errors = mock(List.class);
+
+        utils.getDelay(input, errors);
+
         verify(errors).add("Could not extract delay from string: invalid-format");
     }
 
@@ -413,7 +586,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirection_withNullMainStations() {
+    void getDirectionReturnEmpty_withNullMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = null;
@@ -422,11 +595,22 @@ class AdapterUtilsTest {
         List<String> result = utils.getDirection(mainStations, errors);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getDirectionAddError_withNullMainStations() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String mainStations = null;
+        List<String> errors = mock(List.class);
+
+        utils.getDirection(mainStations, errors);
+
         verify(errors).add("No main stations found");
     }
 
     @Test
-    void getDirection_withBlankMainStations() {
+    void getDirectionReturnEmpty_withBlankMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = "   ";
@@ -435,6 +619,17 @@ class AdapterUtilsTest {
         List<String> result = utils.getDirection(mainStations, errors);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getDirectionAddError_withBlankMainStations() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String mainStations = "  ";
+        List<String> errors = mock(List.class);
+
+        utils.getDirection(mainStations, errors);
+
         verify(errors).add("No main stations found");
     }
 
@@ -451,7 +646,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDuration_withNecunoscută() {
+    void getStopDurationReturnNull_withNecunoscută() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "necunoscută";
@@ -460,19 +655,41 @@ class AdapterUtilsTest {
         Duration result = utils.getStopDuration(duration, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getStopDurationDoesNotAddError_withNecunoscută() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String duration = "necunoscută";
+        List<String> errors = mock(List.class);
+
+        utils.getStopDuration(duration, errors);
+
         verifyNoInteractions(errors);
     }
 
     @Test
-    void getStopDuration_withInvalidFormat() {
+    void getStopDurationReturnNull_withInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
-        String duration = "invalid-format";
+        String duration = "invalid format";
         List<String> errors = mock(List.class);
 
         Duration result = utils.getStopDuration(duration, errors);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void getStopDurationAddsError_withInvalidFormat() {
+        AdapterUtils utils = new AdapterUtils(null);
+
+        String duration = "invalid-format";
+        List<String> errors = mock(List.class);
+
+        utils.getStopDuration(duration, errors);
+
         verify(errors).add("Could not convert label invalid-format into duration");
     }
 }

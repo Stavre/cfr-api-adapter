@@ -1,5 +1,7 @@
 package com.stavre.cfrapiadapter.adapter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
@@ -8,25 +10,25 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import static org.assertj.core.api.Assertions.assertThat;
 
 class StationTrainAdapterTest {
 
-    public static final String OTHER_STATION = "Arad";
-    public static final List<String> STATIONS = List.of("stationA", "stationB");
+    private static final String OTHER_STATION = "Arad";
+    private static final List<String> STATIONS = List.of("stationA", "stationB");
+    private static final TrainMetadataDto TRAIN_METADATA = new TrainMetadataDto("id", "number", "category", "operator");
+    public static final String OTHER_STATION1 = "Curtici";
 
     @Test
     void testAdapt_withBothInputsPresentAndMatching() {
         // Arrange
         StationTrainAdapter adapter = new StationTrainAdapter();
 
-        TrainMetadataDto trainMetadataDto = new TrainMetadataDto("id", "number", "category", "operator");
         EnrichedTrainArrivalDepartureDto arrival = EnrichedTrainArrivalDepartureDto.builder()
                 .timestamp(LocalDateTime.now())
                 .delay(Duration.ofMinutes(30))
                 .platform("2B")
-                .otherStation("Curtici")
-                .train(trainMetadataDto)
+                .otherStation(OTHER_STATION1)
+                .train(TRAIN_METADATA)
                 .mainStations(STATIONS)
                 .stopDuration(Duration.ofMinutes(15))
                 .build();
@@ -36,7 +38,7 @@ class StationTrainAdapterTest {
                 .delay(Duration.ofMinutes(30))
                 .platform("2B")
                 .otherStation(OTHER_STATION)
-                .train(trainMetadataDto)
+                .train(TRAIN_METADATA)
                 .mainStations(STATIONS)
                 .stopDuration(Duration.ofMinutes(15))
                 .build();
@@ -54,7 +56,7 @@ class StationTrainAdapterTest {
                         .platform("2B")
                         .direction(STATIONS)
                         .stopDuration(Duration.ofMinutes(15))
-                        .train(trainMetadataDto)
+                        .train(TRAIN_METADATA)
                         .errors(List.of())
                         .build()
         );
@@ -71,14 +73,13 @@ class StationTrainAdapterTest {
         // Arrange
         StationTrainAdapter adapter = new StationTrainAdapter();
 
-        TrainMetadataDto trainMetadataDto = new TrainMetadataDto("id", "number", "category", "operator");
 
         EnrichedTrainArrivalDepartureDto arrival = EnrichedTrainArrivalDepartureDto.builder()
                 .timestamp(LocalDateTime.now())
                 .delay(Duration.ofMinutes(30))
                 .platform("2A")
-                .otherStation("Curtici")
-                .train(trainMetadataDto)
+                .otherStation(OTHER_STATION1)
+                .train(TRAIN_METADATA)
                 .mainStations(STATIONS)
                 .stopDuration(Duration.ofMinutes(15))
                 .build();
@@ -96,7 +97,7 @@ class StationTrainAdapterTest {
                         .platform("2A")
                         .direction(STATIONS)
                         .stopDuration(Duration.ofMinutes(15))
-                        .train(trainMetadataDto)
+                        .train(TRAIN_METADATA)
                         .errors(List.of("Missing departure information"))
                         .build()
         );
@@ -113,14 +114,13 @@ class StationTrainAdapterTest {
         // Arrange
         StationTrainAdapter adapter = new StationTrainAdapter();
 
-        TrainMetadataDto trainMetadataDto = new TrainMetadataDto("id", "number", "category", "operator");
 
         EnrichedTrainArrivalDepartureDto departure = EnrichedTrainArrivalDepartureDto.builder()
                 .timestamp(LocalDateTime.now())
                 .delay(Duration.ofMinutes(30))
                 .platform("1D")
-                .otherStation("Curtici")
-                .train(new TrainMetadataDto("id", "number", "category", "operator"))
+                .otherStation(OTHER_STATION1)
+                .train(TRAIN_METADATA)
                 .mainStations(STATIONS)
                 .stopDuration(Duration.ofMinutes(15))
                 .build();
@@ -138,7 +138,7 @@ class StationTrainAdapterTest {
                         .platform("1D")
                         .direction(STATIONS)
                         .stopDuration(Duration.ofMinutes(15))
-                        .train(trainMetadataDto)
+                        .train(TRAIN_METADATA)
                         .errors(List.of("Missing arrival information"))
                         .build()
         );
@@ -155,14 +155,12 @@ class StationTrainAdapterTest {
         // Arrange
         StationTrainAdapter adapter = new StationTrainAdapter();
 
-        TrainMetadataDto trainMetadataDto = new TrainMetadataDto("id", "number", "category", "operator");
-
         EnrichedTrainArrivalDepartureDto arrival = EnrichedTrainArrivalDepartureDto.builder()
                 .timestamp(LocalDateTime.now())
                 .delay(Duration.ofMinutes(30))
                 .platform("2")
-                .otherStation("Curtici")
-                .train(trainMetadataDto)
+                .otherStation(OTHER_STATION1)
+                .train(TRAIN_METADATA)
                 .mainStations(STATIONS)
                 .stopDuration(Duration.ofMinutes(15))
                 .build();
@@ -172,7 +170,7 @@ class StationTrainAdapterTest {
                 .delay(Duration.ofMinutes(20)) // Different delay
                 .platform("3") // Different platform
                 .otherStation(OTHER_STATION)
-                .train(trainMetadataDto)
+                .train(TRAIN_METADATA)
                 .mainStations(List.of("stationC", "stationD")) // Different direction
                 .stopDuration(Duration.ofMinutes(10)) // Different stop duration
                 .build();
@@ -190,7 +188,7 @@ class StationTrainAdapterTest {
                         .platform(null)
                         .direction(null)
                         .stopDuration(null)
-                        .train(trainMetadataDto)
+                        .train(TRAIN_METADATA)
                         .errors(List.of("Mismatched stopDuration: arrival=PT15M, departure=PT10M",
                                 "Mismatched platform: arrival=2, departure=3",
                                 "Mismatched direction (mainStations): arrival=[stationA, stationB], departure=[stationC, stationD]"))
