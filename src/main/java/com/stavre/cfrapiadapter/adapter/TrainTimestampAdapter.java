@@ -33,7 +33,15 @@ public class TrainTimestampAdapter {
         }
 
         List<EnrichedTrainStopDto> result = new ArrayList<>(enrichedStops.size());
-        result.add(enrichedStops.getFirst());
+        EnrichedTrainStopDto firstStation = enrichedStops.getFirst();
+        EnrichedTrainStopDto adjustedFirstStation = firstStation
+                .withDeparture(
+                        adjustTimestamp(
+                                firstStation.arrival(),
+                                firstStation.departure()
+                        )
+                );
+        result.add(adjustedFirstStation);
 
         for (int i = 1; i < enrichedStops.size(); i++) {
             EnrichedTrainStopDto previous = result.getLast();

@@ -176,23 +176,27 @@ class StationTrainAdapterTest {
                 .build();
 
         Optional<EnrichedStationTrainDto> expected = Optional.of(
-                EnrichedStationTrainDto.builder()
-                        .arrival(arrival.timestamp())
-                        .arrivalDelay(arrival.delay())
-                        .fromStation(arrival.otherStation())
+            EnrichedStationTrainDto.builder()
+                .arrival(arrival.timestamp())
+                .arrivalDelay(arrival.delay())
+                .fromStation(arrival.otherStation())
 
-                        .departure(departure.timestamp())
-                        .departureDelay(departure.delay())
-                        .toStation(departure.otherStation())
+                .departure(departure.timestamp())
+                .departureDelay(departure.delay())
+                .toStation(departure.otherStation())
 
-                        .platform(null)
-                        .direction(null)
-                        .stopDuration(null)
-                        .train(TRAIN_METADATA)
-                        .errors(List.of("Mismatched stopDuration: arrival=PT15M, departure=PT10M",
-                                "Mismatched platform: arrival=2, departure=3",
-                                "Mismatched direction (mainStations): arrival=[stationA, stationB], departure=[stationC, stationD]"))
-                        .build()
+                .platform(null)
+                .direction(null)
+                .stopDuration(null)
+                .train(TRAIN_METADATA)
+                .errors(
+                    List.of(
+                        "Mismatched stopDuration: arrival=PT15M, departure=PT10M",
+                        "Mismatched platform: arrival=2, departure=3",
+                        "Mismatched direction (mainStations): "
+                                + "arrival=[stationA, stationB], departure=[stationC, stationD]"
+                        )
+                    ).build()
         );
 
         // Act

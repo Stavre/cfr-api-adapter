@@ -93,9 +93,9 @@ class StationTrainDeparturesScraperTest {
 
     @Test
     void stationTrainDepartureOriginStationIsScraped() throws IOException {
-        String trainDepartureFilePath = "src/test/resources/scraper/station/departure/train-departure-origin-station.html";
+        String trainDepartureFile = "src/test/resources/scraper/station/departure/train-departure-origin-station.html";
 
-        Element row = loadElementFromFile(trainDepartureFilePath);
+        Element row = loadElementFromFile(trainDepartureFile);
 
         TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
                 .time("7:06")

@@ -35,7 +35,7 @@ class AdapterUtilsTest {
     private static final String PLATFORM_STRING_IS_NULL_OR_BLANK = "Platform string is null or blank.";
 
     @Test
-    void shouldReturnNull_WhenInputIsNull() {
+    void shouldReturnNullWhenPlatformInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform(null, errors);
@@ -44,7 +44,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_WhenInputIsNull() {
+    void shouldAddErrorWhenPlatformInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform(null, errors);
@@ -56,7 +56,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_WhenInputIsBlank() {
+    void shouldReturnNullWhenPlatformInputIsBlank() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("  ", errors);
@@ -66,7 +66,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_WhenInputIsBlank() {
+    void shouldAddErrorWhenPlatformInputIsBlank() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform("   ", errors);
@@ -78,7 +78,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_WhenFormatDoesNotMatch() {
+    void shouldReturnNullWhenPlatformFormatDoesNotMatch() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("Linia 4A", errors); // wrong case
@@ -87,7 +87,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_WhenFormatDoesNotMatch() {
+    void shouldAddErrorWhenPlatformFormatDoesNotMatch() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform("Linia 4A", errors); // wrong case
@@ -99,7 +99,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldExtractPlatform_WhenFormatIsValid() {
+    void shouldExtractPlatformWhenFormatIsValid() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("linia 4A", errors);
@@ -108,7 +108,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_WhenFormatIsValid() {
+    void shouldNotAddErrorWhenFormatIsValid() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform("linia 4A", errors);
@@ -117,7 +117,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldExtractPlatform_WhenExtraSpacesArePresent() {
+    void shouldExtractPlatformWhenExtraSpacesArePresent() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("  linia    X123   ", errors);
@@ -126,7 +126,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_WhenExtraSpacesArePresent() {
+    void shouldNotAddErrorWhenExtraSpacesArePresent() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform("  linia    X123   ", errors);
@@ -135,7 +135,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_WhenNothingAfterLinia() {
+    void shouldReturnNullWhenNothingAfterLinia() {
         List<String> errors = new ArrayList<>();
 
         String result = utils.getTrainPlatform("linia ", errors);
@@ -144,7 +144,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_WhenNothingAfterLinia() {
+    void shouldAddErrorWhenNothingAfterLinia() {
         List<String> errors = new ArrayList<>();
 
         utils.getTrainPlatform("linia ", errors);
@@ -156,7 +156,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnTimestamp_whenDateAndTimeAreValid() {
+    void shouldReturnTimestampWhenDateAndTimeAreValid() {
         List<String> errors = new ArrayList<>();
 
         LocalDate date = LocalDate.of(2024, 2, 10);
@@ -171,7 +171,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_whenDateAndTimeAreValid() {
+    void shouldNotAddErrorWhenDateAndTimeAreValid() {
         List<String> errors = new ArrayList<>();
 
         LocalDate date = LocalDate.of(2024, 2, 10);
@@ -186,7 +186,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_whenInputIsNull() {
+    void shouldReturnNullWhenInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay(null, errors);
@@ -195,7 +195,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_whenInputIsNull() {
+    void shouldAddErrorWhenDelayInputIsNull() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay(null, errors);
@@ -205,7 +205,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_whenInputIsBlank() {
+    void shouldReturnNullWhenDelayInputIsBlank() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("  ", errors);
@@ -215,7 +215,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_whenInputIsBlank() {
+    void shouldAddErrorWhenDelayInputIsBlank() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("  ", errors);
@@ -225,7 +225,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnZeroDuration_whenInputIsLaTimp() {
+    void shouldReturnZeroDurationWhenInputIsLaTimp() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("la timp", errors);
@@ -234,7 +234,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_whenInputIsLaTimp() {
+    void shouldNotAddErrorWhenInputIsLaTimp() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("la timp", errors);
@@ -243,7 +243,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnZeroDuration_whenInputIsLaTimpWithAsterisk() {
+    void shouldReturnZeroDurationWhenInputIsLaTimpWithAsterisk() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("la timp*", errors);
@@ -252,7 +252,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_whenInputIsLaTimpWithAsterisk() {
+    void shouldNotAddErrorWhenInputIsLaTimpWithAsterisk() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("la timp*", errors);
@@ -261,7 +261,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldExtractDelay_whenValidDelayString() {
+    void shouldExtractDelayWhenValidDelayString() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("+7 min (întârziere)", errors);
@@ -270,7 +270,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_whenValidDelayString() {
+    void shouldNotAddErrorWhenValidDelayString() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("+7 min (întârziere)", errors);
@@ -279,7 +279,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldExtractDelay_whenValidDelayStringWithAsterisk() {
+    void shouldExtractDelayWhenValidDelayStringWithAsterisk() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("+3 min (întârziere)*", errors);
@@ -288,7 +288,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldNotAddError_whenValidDelayStringWithAsterisk() {
+    void shouldNotAddErrorWhenValidDelayStringWithAsterisk() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("+3 min (întârziere)*", errors);
@@ -297,7 +297,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_whenMissingSpaceBeforeMin() {
+    void shouldReturnNullWhenMissingSpaceBeforeMin() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("+5min", errors);
@@ -307,7 +307,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_whenMissingSpaceBeforeMin() {
+    void shouldAddErrorWhenMissingSpaceBeforeMin() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("+5min", errors);
@@ -317,7 +317,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldReturnNull_whenInvalidFormat() {
+    void shouldReturnNullWhenInvalidFormat() {
         List<String> errors = new ArrayList<>();
 
         Duration result = utils.getDelay("random text", errors);
@@ -327,7 +327,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void shouldAddError_whenInvalidFormat() {
+    void shouldAddErrorWhenInvalidFormat() {
         List<String> errors = new ArrayList<>();
 
         utils.getDelay("random text", errors);
@@ -337,7 +337,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatform_withValidComplexPlatformString() {
+    void getTrainPlatformWithValidComplexPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = "linia 2A";
@@ -349,7 +349,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformDoesNotAddError_withValidComplexPlatformString() {
+    void getTrainPlatformDoesNotAddErrorWithValidComplexPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = "linia 2A";
@@ -361,7 +361,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformReturnNull_withNullPlatformString() {
+    void getTrainPlatformReturnNullWithNullPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = null;
@@ -373,7 +373,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformAddError_withNullPlatformString() {
+    void getTrainPlatformAddErrorWithNullPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = null;
@@ -385,7 +385,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformReturnNull_withBlankPlatformString() {
+    void getTrainPlatformReturnNullWithBlankPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = " ";
@@ -397,7 +397,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformAddError_withBlankPlatformString() {
+    void getTrainPlatformAddErrorWithBlankPlatformString() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = " ";
@@ -409,7 +409,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformReturnNull_withInvalidFormat() {
+    void getTrainPlatformReturnNullWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = "linia2";
@@ -421,7 +421,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTrainPlatformAddError_withInvalidFormat() {
+    void getTrainPlatformAddErrorWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String platform = "linia2";
@@ -433,7 +433,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTimestamp_withValidDateAndTime() {
+    void getTimestampWithValidDateAndTime() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String time = "19:30";
@@ -444,7 +444,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTimestampReturnNull_withInvalidDate() {
+    void getTimestampReturnNullWithInvalidDate() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String date = "invalid-date";
@@ -457,7 +457,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTimestampAddError_withInvalidDate() {
+    void getTimestampAddErrorWithInvalidDate() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String date = "invalid-date";
@@ -473,7 +473,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTimestampReturnNull_withInvalidTime() {
+    void getTimestampReturnNullWithInvalidTime() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String date = "10.01.2024";
@@ -486,7 +486,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getTimestampAddErrors_withInvalidTime() {
+    void getTimestampAddErrorsWithInvalidTime() {
         AdapterUtils utils = new AdapterUtils(new DateTimeUtils());
 
         String date = "10.01.2024";
@@ -502,7 +502,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelay_withValidDelay() {
+    void getDelayWithValidDelay() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "+15 min (întârziere)*";
@@ -514,7 +514,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelayReturnNull_withEmptyInput() {
+    void getDelayReturnNullWithEmptyInput() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "";
@@ -526,7 +526,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelayAddError_withEmptyInput() {
+    void getDelayAddErrorWithEmptyInput() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "";
@@ -538,7 +538,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelay_withValidNoDuration() {
+    void getDelayWithValidNoDuration() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "la timp*";
@@ -550,7 +550,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelayReturnNull_withInvalidFormat() {
+    void getDelayReturnNullWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "invalid format";
@@ -562,7 +562,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDelayAddError_withInvalidFormat() {
+    void getDelayAddErrorWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String input = "invalid-format";
@@ -574,7 +574,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirection_withValidMainStations() {
+    void getDirectionWithValidMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = "stationA-stationB";
@@ -586,7 +586,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirectionReturnEmpty_withNullMainStations() {
+    void getDirectionReturnEmptyWithNullMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = null;
@@ -598,7 +598,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirectionAddError_withNullMainStations() {
+    void getDirectionAddErrorWithNullMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = null;
@@ -610,7 +610,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirectionReturnEmpty_withBlankMainStations() {
+    void getDirectionReturnEmptyWithBlankMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = "   ";
@@ -622,7 +622,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getDirectionAddError_withBlankMainStations() {
+    void getDirectionAddErrorWithBlankMainStations() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String mainStations = "  ";
@@ -634,7 +634,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDuration_withValidStopDuration() {
+    void getStopDurationWithValidStopDuration() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "15 min";
@@ -646,7 +646,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDurationReturnNull_withNecunoscută() {
+    void getStopDurationReturnNullWithUnknownDuration() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "necunoscută";
@@ -658,7 +658,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDurationDoesNotAddError_withNecunoscută() {
+    void getStopDurationDoesNotAddErrorWithUnknownDuration() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "necunoscută";
@@ -670,7 +670,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDurationReturnNull_withInvalidFormat() {
+    void getStopDurationReturnNullWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "invalid format";
@@ -682,7 +682,7 @@ class AdapterUtilsTest {
     }
 
     @Test
-    void getStopDurationAddsError_withInvalidFormat() {
+    void getStopDurationAddsErrorWithInvalidFormat() {
         AdapterUtils utils = new AdapterUtils(null);
 
         String duration = "invalid-format";

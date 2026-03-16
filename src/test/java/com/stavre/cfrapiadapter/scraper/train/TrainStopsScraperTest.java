@@ -166,8 +166,8 @@ class TrainStopsScraperTest {
     @Test
     void scrapeTrainStopWithArrivalDepartureAndPlatformDelay() throws IOException {
         // Load the HTML content from a file
-        String trainStopsFilePath = "src/test/resources/scraper/train/train-stop-arrrival-departure-with-platform-delay.html";
-        Element row = loadElementFromFile(trainStopsFilePath);
+        String trainStopsFile = "src/test/resources/scraper/train/train-stop-arrrival-departure-platform-delay.html";
+        Element row = loadElementFromFile(trainStopsFile);
 
         // Define expected TrainStopDto
         Optional<TrainStopDto> expected = Optional.of(

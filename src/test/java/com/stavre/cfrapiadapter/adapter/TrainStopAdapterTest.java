@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.AdapterUtils;
 import org.junit.jupiter.api.Test;
@@ -33,9 +34,9 @@ class TrainStopAdapterTest {
     void adapt_whenScrapedDtoMissing_returnsDtoWithError() {
         var result = adapter.adapt(Optional.empty(), DATE);
 
-        assertThat(result).isNotNull();
+        var expected = new EnrichedTrainStopDto(List.of("Could not scrape this train stop from CFR page."));
 
-        assertThat(result.errors()).containsExactly("Could not scrape this train stop from CFR page.");
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test
@@ -69,42 +70,39 @@ class TrainStopAdapterTest {
         when(utils.getTrainPlatform("linia 5", new ArrayList<>()))
                 .thenReturn("5");
 
+        EnrichedTrainStopDto expected = EnrichedTrainStopDto.builder()
+                .arrival(arrivalTs)
+                .arrivalDelay(Duration.ofMinutes(2))
+                .departure(departureTs)
+                .departureDelay(Duration.ofMinutes(5))
+                .station("Bucharest Nord")
+                .journeyKm(123)
+                .stopDuration(Duration.ofMinutes(2))
+                .platform("5")
+                .errors(List.of())
+                .trainStopMessages(List.of("label1", "label2"))
+                .build();
+
         // when
         var result = adapter.adapt(Optional.of(scraped), DATE);
 
         // then
-        assertThat(result).isNotNull();
-
-        assertThat(result.arrival()).isEqualTo(arrivalTs);
-        assertThat(result.arrivalDelay()).isEqualTo(Duration.ofMinutes(2));
-
-        assertThat(result.departure()).isEqualTo(departureTs);
-        assertThat(result.departureDelay()).isEqualTo(Duration.ofMinutes(5));
-
-        assertThat(result.station()).isEqualTo("Bucharest Nord");
-        assertThat(result.journeyKm()).isEqualTo(123);
-        assertThat(result.stopDuration()).isEqualTo(Duration.ofMinutes(2));
-        assertThat(result.platform()).isEqualTo("5");
-
-        assertThat(result.trainStopMessages()).containsExactly("label1", "label2");
-
-        // no errors expected
-        assertThat(result.errors()).isEmpty();
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test
     void adapt_whenSomeFieldsFail_parsesWhatItCanAndAddsErrors() {
-        // given: invalid km and unknown stop duration, invalid platform format, timestamp parsing fails for arrival
+        // given
         var scraped = new TrainStopDto(
-                "bad-time",            // arrivalTime -> utils will return null and add errors
-                "+3 min (întârziere)", // arrivalTimeLabel
-                "15:00",               // departureTime
-                "la timp",             // departureTimeLabel -> zero delay
-                "   ",                 // stationName blank -> adapter will add error
-                List.of(),             // stationLabels
-                "not-a-number",        // km invalid
-                "necunoscută",         // stopDuration unknown -> utils returns null
-                "platform-bad-format"  // platform invalid -> utils will add error and return null
+                "bad-time",
+                "+3 min (întârziere)",
+                "15:00",
+                "la timp",
+                "   ",
+                List.of(),
+                "not-a-number",
+                "necunoscută",
+                "platform-bad-format"
         );
 
         // mocks
@@ -121,39 +119,24 @@ class TrainStopAdapterTest {
         lenient().when(utils.getTrainPlatform(eq("platform-bad-format"), org.mockito.ArgumentMatchers.anyList()))
                 .thenReturn(null);
 
+        EnrichedTrainStopDto expected = EnrichedTrainStopDto.builder()
+                .arrival(null)
+                .arrivalDelay(Duration.ofMinutes(3))
+                .departure(LocalDateTime.of(2024, 1, 10, 15, 0))
+                .departureDelay(Duration.ofMinutes(0))
+                .station(null)
+                .journeyKm(null)
+                .stopDuration(null)
+                .errors(List.of("Station name is blank",
+                        "Could not convert not-a-number to number of kilometers",
+                        "Stop duration necunoscută could not be converted to Duration"))
+                .trainStopMessages(List.of())
+                .build();
+
         // when
         var result = adapter.adapt(Optional.of(scraped), DATE);
 
         // then
-        assertThat(result).isNotNull();
-
-        // arrival timestamp failed -> null
-        assertThat(result.arrival()).isNull();
-        // arrival delay parsed
-        assertThat(result.arrivalDelay()).isEqualTo(Duration.ofMinutes(3));
-
-        // departure parsed
-        assertThat(result.departure()).isEqualTo(LocalDateTime.of(2024, 1, 10, 15, 0));
-        assertThat(result.departureDelay()).isEqualTo(Duration.ZERO);
-
-        // station blank -> null
-        assertThat(result.station()).isNull();
-
-        // km invalid -> null
-        assertThat(result.journeyKm()).isNull();
-
-        // stopDuration "necunoscută" -> adapter's getStopDuration returns null
-        assertThat(result.stopDuration()).isNull();
-
-        // platform invalid -> null
-        assertThat(result.platform()).isNull();
-
-        // errors should contain messages for missing/invalid pieces
-        assertThat(result.errors()).isNotEmpty();
-        assertThat(result.errors()).contains(
-                "Station name is blank",
-                "Could not convert not-a-number to number of kilometers",
-                "Stop duration necunoscută could not be converted to Duration"
-        );
+        assertThat(result).isEqualTo(expected);
     }
 }

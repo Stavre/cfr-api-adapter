@@ -12,35 +12,35 @@ class DateTimeUtilsTest {
     private final DateTimeUtils converter = new DateTimeUtils();
 
     @Test
-    void shouldReturnEmptyOptional_WhenInputIsNull() {
+    void shouldReturnEmptyOptionalWhenInputIsNull() {
         Optional<LocalTime> result = converter.convertTime(null);
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptional_WhenInputIsBlank() {
+    void shouldReturnEmptyOptionalWhenInputIsBlank() {
         Optional<LocalTime> result = converter.convertTime("   ");
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptional_WhenInputIsInvalidFormat() {
+    void shouldReturnEmptyOptionalWhenInputIsInvalidFormat() {
         Optional<LocalTime> result = converter.convertTime("abc");
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptional_WhenMinutesAreInvalid() {
+    void shouldReturnEmptyOptionalWhenMinutesAreInvalid() {
         Optional<LocalTime> result = converter.convertTime("10:99");
 
         assertThat(result).isEmpty();
     }
 
     @Test
-    void shouldReturnEmptyOptional_WhenHoursAreInvalid() {
+    void shouldReturnEmptyOptionalWhenHoursAreInvalid() {
         Optional<LocalTime> result = converter.convertTime("25:10");
 
         assertThat(result).isEmpty();

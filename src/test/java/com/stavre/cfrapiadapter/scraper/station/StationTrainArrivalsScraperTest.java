@@ -80,7 +80,8 @@ class StationTrainArrivalsScraperTest {
                 .time("11:14")
                 .timeLabel("+2 min (întârziere)")
                 .train(new TrainMetadataDto("R-E 3002", "3002", "R-E", "CFR Călători"))
-                .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Breaza hc - Câmpina - Florești Prahova - Ploiești Vest - Buftea - București Nord")
+                .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Breaza hc "
+                        + "- Câmpina - Florești Prahova - Ploiești Vest - Buftea - București Nord")
                 .otherStation(OTHER_STATION)
                 .platform("linia 3")
                 .stopLabel("2 min (până la 11:16)")
@@ -94,15 +95,16 @@ class StationTrainArrivalsScraperTest {
 
     @Test
     void stationTrainDepartureTerminusStationIsScraped() throws IOException {
-        String trainDepartureFilePath = "src/test/resources/scraper/station/arrival/train-arrival-terminus-station.html";
+        String trainDepartureFile = "src/test/resources/scraper/station/arrival/train-arrival-terminus-station.html";
 
-        Element row = loadElementFromFile(trainDepartureFilePath);
+        Element row = loadElementFromFile(trainDepartureFile);
 
         TrainArrivalDepartureDto expected = TrainArrivalDepartureDto.builder()
                 .time("11:34")
                 .timeLabel("la timp")
                 .train(new TrainMetadataDto("R-E 11032", "11032", "R-E", "Regio Călători"))
-                .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Câmpina - Florești Prahova - Ploiești Vest - Buftea - Chitila - București Nord")
+                .mainStations("Brașov - Predeal - Azuga - Bușteni - Sinaia - Comarnic - Câmpina"
+                        + " - Florești Prahova - Ploiești Vest - Buftea - Chitila - București Nord")
                 .otherStation(OTHER_STATION)
                 .platform("linia 4A")
                 .stopLabel("necunoscută (stație terminus)")

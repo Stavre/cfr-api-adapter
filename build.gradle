@@ -92,3 +92,7 @@ jacocoTestCoverageVerification {
         }
     }
 }
+
+check {
+    dependsOn("pmdTest")
+}

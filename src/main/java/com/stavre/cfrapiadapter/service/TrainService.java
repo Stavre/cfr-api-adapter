@@ -3,9 +3,7 @@ package com.stavre.cfrapiadapter.service;
 import com.stavre.cfrapiadapter.adapter.TrainAdapter;
 import com.stavre.cfrapiadapter.adapter.TrainTimestampAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
-import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainStopDto;
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
-import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.repository.TrainRepository;
 import jakarta.annotation.PostConstruct;
@@ -38,7 +36,7 @@ public class TrainService {
 
     public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train) {
 
-        Map<TrainBranchDto, EnrichedTrainStopDto> branchStops = train.stops()
+        var branchStops = train.stops()
                 .entrySet().stream()
                 .map(s -> Map.entry(s.getKey(), s.getValue().getLast()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -51,7 +49,7 @@ public class TrainService {
 
     public TrainDelayResponseDto getTrainDelay(EnrichedTrainDto train, String stationName) {
 
-        Map<TrainBranchDto, EnrichedTrainStopDto> branchStops = train.stops()
+        var branchStops = train.stops()
                 .entrySet().stream()
                 .filter(s -> s.getValue().stream().anyMatch(stop -> stop.station().equals(stationName)))
                 .map(

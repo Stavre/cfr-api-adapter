@@ -5,11 +5,8 @@ import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainMetadataDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainStopDto;
 import com.stavre.cfrapiadapter.utils.ScraperUtils;
-import com.stavre.cfrapiadapter.validator.TrainPageValidator;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +27,7 @@ public class TrainScraper {
         Element pageBody = utils.scrapePageBody(html);
 
         TrainMetadataDto metadataDto = trainMetadataScraper.scrapeMetadata(pageBody);
-        Map<TrainBranchDto, List<Optional<TrainStopDto>>> branchStops = scrapeTrainBranches(pageBody);
+        var branchStops = scrapeTrainBranches(pageBody);
         return new TrainDto(metadataDto, branchStops);
     }
 
