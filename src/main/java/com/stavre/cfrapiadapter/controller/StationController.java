@@ -21,8 +21,8 @@ public class StationController {
     @GetMapping("/station/{stationName}")
     public List<EnrichedStationTrainDto> getDepartures(
             @PathVariable String stationName,
-            @RequestParam(value = "date", required = false) String inputDate
-    ) {
+            @RequestParam(value = "date", required = false) String inputDate) {
+
         String date = dateTimeUtils.getDateOrGetToday(inputDate);
 
         return service.getStationTrains(stationName, date);

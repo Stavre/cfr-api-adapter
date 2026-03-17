@@ -22,8 +22,8 @@ public class StationArrivalsController {
     @GetMapping("/delayed/{stationName}")
     public List<EnrichedStationTrainDto> getDelayedArrivals(
             @PathVariable String stationName,
-            @RequestParam(value = "date", required = false) String inputDate
-    ) {
+            @RequestParam(value = "date", required = false) String inputDate) {
+
         String date = dateTimeUtils.getDateOrGetToday(inputDate);
         List<EnrichedStationTrainDto> arrivals = service.getStationTrains(stationName, date);
 
@@ -33,8 +33,8 @@ public class StationArrivalsController {
     @GetMapping("/delayed/total/{stationName}")
     public DelayDto getDelayedDeparturesTotal(
             @PathVariable String stationName,
-            @RequestParam(value = "date", required = false) String inputDate
-    ) {
+            @RequestParam(value = "date", required = false) String inputDate) {
+
         String date = dateTimeUtils.getDateOrGetToday(inputDate);
 
         List<EnrichedStationTrainDto> arrivals = service.getStationTrains(stationName, date);
