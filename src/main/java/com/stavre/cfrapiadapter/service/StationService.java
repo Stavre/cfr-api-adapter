@@ -54,8 +54,8 @@ public class StationService {
 
         for (var arrival : arrivalsList) {
             Optional<EnrichedTrainArrivalDepartureDto> matchingDeparture = departuresList.stream()
-                    .filter(d ->
-                            d.isPresent() && d.get().train().equals(arrival.get().train()))
+                    .filter(Optional::isPresent)
+                    .filter(d -> arrival.isPresent() && d.get().train().equals(arrival.get().train()))
                     .findFirst()
                     .orElse(Optional.empty());
 
