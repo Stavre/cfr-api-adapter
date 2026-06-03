@@ -20,6 +20,7 @@ public class TrainRepository {
 
     public TrainDto getTrainStops(String trainId, String date) {
         String tokenPage = proxy.getTrainTokenPage(trainId, date);
+        validator.validate(tokenPage);
 
         RequestTrainTimeTableDto request = requestScraper.scrapeRequestDetails(tokenPage);
 

@@ -26,11 +26,13 @@ public class TrainBranchScraper {
     }
 
     private List<Element> scrapeBranchElements(Element pageBody) {
-        return pageBody
+        Element jumbotron = pageBody
                 .getElementsByClass("jumbotron p-3 mb-3")
-                .getFirst()
-                .child(1)
-                .getElementsByClass("m-1 flex-grow-1");
+                .getFirst();
+        if (jumbotron.childrenSize() < 2) {
+            return List.of();
+        }
+        return jumbotron.child(1).getElementsByClass("m-1 flex-grow-1");
     }
 
     private TrainBranchDto scrapeBranch(Element el) {

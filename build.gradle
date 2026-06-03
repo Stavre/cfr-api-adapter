@@ -41,6 +41,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'commons-io:commons-io:2.21.0'
     testImplementation 'org.projectlombok:lombok'
     testImplementation 'org.assertj:assertj-core:4.0.0-M1'
