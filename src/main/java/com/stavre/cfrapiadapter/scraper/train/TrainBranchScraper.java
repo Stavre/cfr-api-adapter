@@ -3,14 +3,14 @@ package com.stavre.cfrapiadapter.scraper.train;
 import com.stavre.cfrapiadapter.dto.scraper.TrainBranchDto;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import org.jsoup.select.Nodes;
 import org.springframework.stereotype.Component;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
 public class TrainBranchScraper {
+
+    private static final int MIN_CHILDREN_FOR_BRANCHES = 2;
 
     public List<Element> scrapeTrainTimeTables(Element page) {
         return page.getElementsByAttributeValue("class", "list-group");
@@ -29,7 +29,7 @@ public class TrainBranchScraper {
         Element jumbotron = pageBody
                 .getElementsByClass("jumbotron p-3 mb-3")
                 .getFirst();
-        if (jumbotron.childrenSize() < 2) {
+        if (jumbotron.childrenSize() < MIN_CHILDREN_FOR_BRANCHES) {
             return List.of();
         }
         return jumbotron.child(1).getElementsByClass("m-1 flex-grow-1");

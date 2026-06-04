@@ -37,6 +37,7 @@ public class StationRequestScraper {
     }
 
     private String scrapeStationName(Element pageBody) {
-        return pageBody.getElementById("StationName").attribute("value").getValue();
+        Element el = pageBody.getElementById("StationName");
+        return el == null ? "" : el.attr("value");
     }
 }

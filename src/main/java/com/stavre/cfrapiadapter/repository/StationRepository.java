@@ -6,6 +6,7 @@ import com.stavre.cfrapiadapter.dto.request.RequestStationTrainsDto;
 import com.stavre.cfrapiadapter.proxy.TrainStationProxy;
 import com.stavre.cfrapiadapter.scraper.station.StationRequestScraper;
 import com.stavre.cfrapiadapter.scraper.station.StationScraper;
+import com.stavre.cfrapiadapter.validator.PageValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -19,11 +20,13 @@ public class StationRepository {
     private final TrainStationProxy proxy;
     private final StationRequestScraper stationRequestScraper;
     private final StationScraper scraper;
+    private final PageValidator validator;
 
     private final EnrichedTrainArrivalDepartureAdapter enrichedTrainArrivalDepartureAdapter;
 
     public List<Optional<EnrichedTrainArrivalDepartureDto>> getArrivals(String stationName, String date) {
         String response = proxy.getStationTokenPage(stationName, date);
+        validator.validate(response);
         RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
 
         String secondResult = proxy.getStationTrains(request);
@@ -36,6 +39,7 @@ public class StationRepository {
 
     public List<Optional<EnrichedTrainArrivalDepartureDto>> getDepartures(String stationName, String date) {
         String response = proxy.getStationTokenPage(stationName, date);
+        validator.validate(response);
         RequestStationTrainsDto request = stationRequestScraper.scrapeRequestDetails(response);
 
         String secondResult = proxy.getStationTrains(request);

@@ -91,6 +91,18 @@ public class StationService {
                 .toList();
     }
 
+    public List<EnrichedStationTrainDto> getArrivals(List<EnrichedStationTrainDto> stationTrains) {
+        return stationTrains.parallelStream()
+                .filter(train -> train.arrival() != null)
+                .toList();
+    }
+
+    public List<EnrichedStationTrainDto> getDepartures(List<EnrichedStationTrainDto> stationTrains) {
+        return stationTrains.parallelStream()
+                .filter(train -> train.departure() != null)
+                .toList();
+    }
+
     public Duration getTotalArrivalsDelay(List<EnrichedStationTrainDto> stationTrains) {
         return stationTrains
                 .parallelStream()

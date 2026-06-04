@@ -5,7 +5,7 @@ import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
 import com.stavre.cfrapiadapter.proxy.TrainTimeTableProxy;
 import com.stavre.cfrapiadapter.scraper.train.TrainRequestScraper;
 import com.stavre.cfrapiadapter.scraper.train.TrainScraper;
-import com.stavre.cfrapiadapter.validator.TrainPageValidator;
+import com.stavre.cfrapiadapter.validator.PageValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -16,7 +16,7 @@ public class TrainRepository {
     private final TrainTimeTableProxy proxy;
     private final TrainScraper scraper;
     private final TrainRequestScraper requestScraper;
-    private final TrainPageValidator validator;
+    private final PageValidator validator;
 
     public TrainDto getTrainStops(String trainId, String date) {
         String tokenPage = proxy.getTrainTokenPage(trainId, date);

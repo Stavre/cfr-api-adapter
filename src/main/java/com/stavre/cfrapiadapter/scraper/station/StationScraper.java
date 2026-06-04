@@ -16,21 +16,19 @@ public class StationScraper {
 
     public List<TrainArrivalDepartureDto> scrapeArrivals(String htmlPage) {
         Element pageBody = utils.scrapePageBody(htmlPage);
-        var arrivalsTable = scrapeArrivalsTable(pageBody);
-        return arrivalDepartureScraper.scrapeTrainArrivalsDepartures(arrivalsTable);
+        var tables = pageBody.getElementsByAttributeValue("class", "list-group");
+        if (tables.isEmpty()) {
+            return List.of();
+        }
+        return arrivalDepartureScraper.scrapeTrainArrivalsDepartures(tables.getLast());
     }
 
     public List<TrainArrivalDepartureDto> scrapeDepartures(String htmlPage) {
         Element pageBody = utils.scrapePageBody(htmlPage);
-        var departuresTable = scrapeDeparturesTable(pageBody);
-        return arrivalDepartureScraper.scrapeTrainArrivalsDepartures(departuresTable);
-    }
-
-    private Element scrapeDeparturesTable(Element pageBody) {
-        return pageBody.getElementsByAttributeValue("class", "list-group").getFirst();
-    }
-
-    private Element scrapeArrivalsTable(Element pageBody) {
-        return pageBody.getElementsByAttributeValue("class", "list-group").getLast();
+        var tables = pageBody.getElementsByAttributeValue("class", "list-group");
+        if (tables.isEmpty()) {
+            return List.of();
+        }
+        return arrivalDepartureScraper.scrapeTrainArrivalsDepartures(tables.getFirst());
     }
 }

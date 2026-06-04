@@ -23,6 +23,19 @@ public class StationDeparturesController {
     private final StationService service;
     private final DateTimeUtils dateTimeUtils;
 
+    @GetMapping("/{stationName}")
+    @Operation(summary = "Get all departures",
+            description = "Returns all departures for a station on the given date.")
+    public List<EnrichedStationTrainDto> getDepartures(
+            @PathVariable String stationName,
+            @Parameter(description = "Date in dd.MM.yyyy format. Defaults to today if omitted.")
+            @RequestParam(value = "date", required = false) String inputDate) {
+
+        String date = dateTimeUtils.getDateOrGetToday(inputDate);
+        List<EnrichedStationTrainDto> trains = service.getStationTrains(stationName, date);
+        return service.getDepartures(trains);
+    }
+
     @GetMapping("/delayed/{stationName}")
     @Operation(summary = "Get delayed departures",
             description = "Returns only delayed departures for a station on the given date.")
