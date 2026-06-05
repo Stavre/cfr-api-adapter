@@ -25,7 +25,7 @@ public class StationController {
     @GetMapping("/station/{stationName}")
     @Operation(summary = "Get station arrivals and departures",
             description = "Returns merged arrivals and departures for a station on the given date.")
-    public List<EnrichedStationTrainDto> getDepartures(
+    public List<EnrichedStationTrainDto> getDeparturesAndArrivals(
             @PathVariable String stationName,
             @Parameter(description = "Date in dd.MM.yyyy format. Defaults to today if omitted.")
             @RequestParam(value = "date", required = false) String inputDate) {

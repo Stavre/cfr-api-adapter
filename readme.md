@@ -61,8 +61,10 @@ Below is a concise reference for the HTTP endpoints implemented by the controlle
 | **/train/{trainNumber}** | GET | `date` (optional) | Get full timetable (stops) for a train on a given date | **EnrichedTrainDto** |
 | **/train/{trainId}/delay** | GET | `date` (optional); `station` (optional) | Get train delay info. If `station` omitted returns overall/last-station delay (includes branches) | **TrainDelayResponseDto** |
 | **/train/all** | GET | _none_ | Return the list of all train numbers (from embedded JSON resource) | **List<String>** |
-| **/station/{stationName}** | GET | `date` (optional) | Get departures for a station on a given date | **List<EnrichedStationTrainDto>** |
+| **/station/{stationName}** | GET | `date` (optional) | Get merged arrivals and departures for a station on a given date | **List<EnrichedStationTrainDto>** |
 | **/station/all** | GET | _none_ | Get all stations with their importance | **List<StationDto>** |
+| **/station/arrivals/{stationName}** | GET | `date` (optional) | Get all arrivals for a station on a given date | **List<EnrichedStationTrainDto>** |
+| **/station/departures/{stationName}** | GET | `date` (optional) | Get all departures for a station on a given date | **List<EnrichedStationTrainDto>** |
 | **/station/departures/delayed/{stationName}** | GET | `date` (optional) | Get delayed departures for a station (one entry per delayed train/branch) | **List<EnrichedStationTrainDto>** |
 | **/station/departures/delayed/total/{stationName}** | GET | `date` (optional) | Get aggregated total departures delay for a station | **DelayDto** |
 | **/station/arrivals/delayed/{stationName}** | GET | `date` (optional) | Get delayed arrivals for a station (one entry per delayed train/branch) | **List<EnrichedStationTrainDto>** |
