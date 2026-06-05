@@ -30,9 +30,10 @@ public class StationService {
     private final StationTrainAdapter adapter;
 
     public List<EnrichedStationTrainDto> getStationTrains(String stationName, String date) {
-        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals = repository.getArrivals(stationName, date);
+        String pageContent = repository.getPageContent(stationName, date);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals = repository.getArrivalsFromPageContent(pageContent, date);
 
-        List<Optional<EnrichedTrainArrivalDepartureDto>> departures = repository.getDepartures(stationName, date);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> departures = repository.getDeparturesFromPageContent(pageContent, date);
 
         return createPairs(arrivals, departures).stream()
                 .map(pair -> adapter.adapt(pair.getKey(), pair.getValue()))
