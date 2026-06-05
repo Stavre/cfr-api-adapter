@@ -9,6 +9,12 @@ spring:
             readTimeout: 120000
             connectTimeout: 120000
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
 cfr:
   base-url: https://mersultrenurilor.infofer.ro
 #
