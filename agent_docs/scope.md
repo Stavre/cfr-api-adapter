@@ -45,10 +45,12 @@ The adapter operates in the Romanian railway domain:
 | GET | `/train/all` | — | All known train numbers (static embedded resource) | `List<String>` |
 | GET | `/station/{stationName}` | `date` (optional) | Merged arrivals and departures for a station | `List<EnrichedStationTrainDto>` |
 | GET | `/station/all` | — | All stations with their importance level (static embedded resource) | `List<StationDto>` |
-| GET | `/station/departures/delayed/{stationName}` | `date` (optional) | Delayed departures only (one entry per delayed train/branch) | `List<EnrichedStationTrainDto>` |
-| GET | `/station/departures/delayed/total/{stationName}` | `date` (optional) | Aggregated total departure delay for a station | `DelayDto` |
+| GET | `/station/arrivals/{stationName}` | `date` (optional) | All arrivals for a station on a given date | `List<EnrichedStationTrainDto>` |
 | GET | `/station/arrivals/delayed/{stationName}` | `date` (optional) | Delayed arrivals only (one entry per delayed train/branch) | `List<EnrichedStationTrainDto>` |
 | GET | `/station/arrivals/delayed/total/{stationName}` | `date` (optional) | Aggregated total arrival delay for a station | `DelayDto` |
+| GET | `/station/departures/{stationName}` | `date` (optional) | All departures for a station on a given date | `List<EnrichedStationTrainDto>` |
+| GET | `/station/departures/delayed/{stationName}` | `date` (optional) | Delayed departures only (one entry per delayed train/branch) | `List<EnrichedStationTrainDto>` |
+| GET | `/station/departures/delayed/total/{stationName}` | `date` (optional) | Aggregated total departure delay for a station | `DelayDto` |
 
 All live-data endpoints accept an optional `date` query parameter in `dd.MM.yyyy` format. When omitted, the current date is used.
 

@@ -69,4 +69,13 @@ spring:
 
 cfr:
   base-url: https://mersultrenurilor.infofer.ro
+
+feign:
+  client:
+    config:
+      default:
+        readTimeout: 2000
+        connectTimeout: 2000
 ```
+
+Note: two Feign timeout configs coexist — `spring.cloud.openfeign` (120 000 ms) and `feign.client` (2 000 ms). Spring Cloud OpenFeign resolves these independently; the `spring.cloud.openfeign` block takes precedence for auto-configured clients.

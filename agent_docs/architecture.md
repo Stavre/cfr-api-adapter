@@ -46,8 +46,8 @@ Four `@RestController` classes, each mapping a subset of routes:
 |---|---|
 | `TrainController` | `/train/{trainNumber}`, `/train/{trainId}/delay`, `/train/all` |
 | `StationController` | `/station/{stationName}`, `/station/all` |
-| `StationArrivalsController` | `/station/arrivals/delayed/{stationName}`, `/station/arrivals/delayed/total/{stationName}` |
-| `StationDeparturesController` | `/station/departures/delayed/{stationName}`, `/station/departures/delayed/total/{stationName}` |
+| `StationArrivalsController` | `/station/arrivals/{stationName}`, `/station/arrivals/delayed/{stationName}`, `/station/arrivals/delayed/total/{stationName}` |
+| `StationDeparturesController` | `/station/departures/{stationName}`, `/station/departures/delayed/{stationName}`, `/station/departures/delayed/total/{stationName}` |
 
 Controllers receive optional `date` query parameters and delegate all logic to services.
 
@@ -111,7 +111,7 @@ Scrapers use JSoup selectors and `ScraperUtils` helpers. They produce raw `scrap
 
 ### Adapter (`adapter/`)
 
-Seven adapter classes that apply extraction rules, validate, and enrich raw scraped DTOs into enriched or response DTOs:
+Five adapter classes that apply extraction rules, validate, and enrich raw scraped DTOs into enriched or response DTOs:
 
 | Class | Transformation |
 |---|---|
@@ -147,14 +147,14 @@ All DTOs are Java records (immutable) where possible, with Lombok used for mutab
 
 ### Validator (`validator/`)
 
-- `TrainPageValidator` — inspects scraped train pages before processing; throws `CfrException` if the page indicates an error (e.g. train not found, invalid date).
+- `PageValidator` — inspects scraped pages before processing; throws `CfrException` if the page indicates an error (e.g. train not found, invalid date).
 
 ## Package Structure
 
 ```
 com.stavre.cfrapiadapter/
 ├── CfrApiAdapterApplication.java
-├── adapter/          (7 classes)
+├── adapter/          (5 classes)
 ├── config/           (FeignConfig)
 ├── controller/       (4 controllers)
 ├── dto/
@@ -162,14 +162,15 @@ com.stavre.cfrapiadapter/
 │   ├── request/      (2 records)
 │   ├── response/     (3 records)
 │   └── scraper/      (5 records)
-├── exception/        (CfrException, CfrExceptionHandler)
+├── exception/        (CfrException, CfrExceptionDto, CfrExceptionHandler)
 ├── proxy/            (2 Feign interfaces)
 ├── repository/       (2 repositories)
 ├── scraper/
+│   ├── VerificationTokensScraper.java
 │   ├── station/      (5 scrapers)
 │   └── train/        (5 scrapers)
 ├── service/          (2 services)
 ├── utils/            (ScraperUtils, DateTimeUtils, AdapterUtils)
-└── validator/        (TrainPageValidator)
+└── validator/        (PageValidator)
 ```
 
