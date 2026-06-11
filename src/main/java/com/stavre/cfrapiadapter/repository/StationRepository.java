@@ -33,7 +33,8 @@ public class StationRepository {
                 .toList();
     }
 
-    public List<Optional<EnrichedTrainArrivalDepartureDto>> getArrivalsFromPageContent(String pageContent, String date) {
+    public List<Optional<EnrichedTrainArrivalDepartureDto>> getArrivalsFromPageContent(
+            String pageContent, String date) {
         return scraper.scrapeArrivals(pageContent)
                 .parallelStream()
                 .map(arrival -> enrichedTrainArrivalDepartureAdapter.adapt(arrival, date))
@@ -49,7 +50,8 @@ public class StationRepository {
                 .toList();
     }
 
-    public List<Optional<EnrichedTrainArrivalDepartureDto>> getDeparturesFromPageContent(String pageContent, String date) {
+    public List<Optional<EnrichedTrainArrivalDepartureDto>> getDeparturesFromPageContent(
+            String pageContent, String date) {
         return scraper.scrapeDepartures(pageContent)
                 .parallelStream()
                 .map(departure -> enrichedTrainArrivalDepartureAdapter.adapt(departure, date))

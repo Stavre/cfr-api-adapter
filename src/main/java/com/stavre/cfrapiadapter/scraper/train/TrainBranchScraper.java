@@ -19,10 +19,41 @@ public class TrainBranchScraper {
     public List<TrainBranchDto> scrapeBranches(Element pageBody) {
         List<Element> branches = scrapeBranchElements(pageBody);
         if (branches.isEmpty()) {
-            return List.of(new TrainBranchDto("Main branch", null, null));
+            return List.of(new TrainBranchDto("Main branch",
+                    scrapeFirstStopStation(pageBody),
+                    scrapeLastStopStation(pageBody)));
         }
 
         return branches.stream().map(this::scrapeBranch).toList();
+    }
+
+    private String scrapeFirstStopStation(Element pageBody) {
+        Element timetable = pageBody.selectFirst("ul.list-group");
+        if (timetable == null) {
+            return null;
+        }
+        Element firstRow = timetable.selectFirst("li.list-group-item");
+        return scrapeStationFromStopRow(firstRow);
+    }
+
+    private String scrapeLastStopStation(Element pageBody) {
+        Element timetable = pageBody.selectFirst("ul.list-group");
+        if (timetable == null) {
+            return null;
+        }
+        Element lastRow = timetable.select("li.list-group-item").last();
+        return scrapeStationFromStopRow(lastRow);
+    }
+
+    private String scrapeStationFromStopRow(Element row) {
+        if (row == null) {
+            return null;
+        }
+        Element stationLink = row.selectFirst(".col-md-5 a");
+        if (stationLink == null) {
+            return null;
+        }
+        return stationLink.text().trim();
     }
 
     private List<Element> scrapeBranchElements(Element pageBody) {

@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.stavre.cfrapiadapter.dto.request.RequestTrainTimeTableDto;
 import com.stavre.cfrapiadapter.proxy.TrainTimeTableProxy;
+import com.stavre.cfrapiadapter.repository.ItinerariesRepository;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
@@ -27,7 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 class TrainControllerTest {
 
     private static final String MAIN_BRANCH =
-            "TrainBranchDto[name=Main branch, originStation=null, destinationStation=null]";
+            "TrainBranchDto[name=Main branch, originStation=București Nord, destinationStation=Aeroport Henri Coandă]";
 
     private static final String STOPS = "$.stops['" + MAIN_BRANCH + "']";
 
@@ -36,6 +37,9 @@ class TrainControllerTest {
 
     @MockitoBean
     private TrainTimeTableProxy proxy;
+
+    @MockitoBean
+    private ItinerariesRepository itinerariesRepository;
 
     @Test
     void getTrainTimeTable_whenCfrReturnsTrainNotFound_returns400WithCfrError() throws Exception {

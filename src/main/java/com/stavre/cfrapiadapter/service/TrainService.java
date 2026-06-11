@@ -5,15 +5,11 @@ import com.stavre.cfrapiadapter.adapter.TrainTimestampAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainDto;
 import com.stavre.cfrapiadapter.dto.response.TrainDelayResponseDto;
 import com.stavre.cfrapiadapter.dto.scraper.TrainDto;
+import com.stavre.cfrapiadapter.repository.ItinerariesRepository;
 import com.stavre.cfrapiadapter.repository.TrainRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -22,9 +18,9 @@ import java.util.stream.Collectors;
 @Service
 public class TrainService {
 
-    private final ObjectMapper objectMapper;
     private List<String> trains;
     private final TrainRepository trainRepository;
+    private final ItinerariesRepository itinerariesRepository;
     private final TrainAdapter trainAdapter;
     private final TrainTimestampAdapter timestampAdapter;
 
@@ -66,10 +62,8 @@ public class TrainService {
     }
 
     @PostConstruct
-    public void init() throws IOException {
-        try (InputStream is = new ClassPathResource("trains.json").getInputStream()) {
-            trains = objectMapper.readValue(is, new TypeReference<>() {});
-        }
+    public void init() {
+        trains = itinerariesRepository.getTrainNumbers();
     }
 
     public List<String> getAllTrains() {

@@ -42,6 +42,7 @@ class TrainBranchScraperTest {
 
         List<TrainBranchDto> actual = scraper.scrapeBranches(body);
 
-        assertThat(actual).isEqualTo(List.of(new TrainBranchDto("Main branch", null, null)));
+        assertThat(actual).isEqualTo(List.of(
+                new TrainBranchDto("Main branch", "București Nord", "Aeroport Henri Coandă")));
     }
 }

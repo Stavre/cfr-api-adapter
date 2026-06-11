@@ -4,15 +4,11 @@ import com.stavre.cfrapiadapter.adapter.StationTrainAdapter;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedStationTrainDto;
 import com.stavre.cfrapiadapter.dto.enriched.EnrichedTrainArrivalDepartureDto;
 import com.stavre.cfrapiadapter.dto.response.StationDto;
+import com.stavre.cfrapiadapter.repository.ItinerariesRepository;
 import com.stavre.cfrapiadapter.repository.StationRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +19,20 @@ import java.util.Optional;
 @Service
 public class StationService {
 
-    private final ObjectMapper objectMapper;
     private List<StationDto> stations;
 
     private final StationRepository repository;
     private final StationTrainAdapter adapter;
+    private final ItinerariesRepository itinerariesRepository;
 
     public List<EnrichedStationTrainDto> getStationTrains(String stationName, String date) {
         String pageContent = repository.getPageContent(stationName, date);
-        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals = repository.getArrivalsFromPageContent(pageContent, date);
 
-        List<Optional<EnrichedTrainArrivalDepartureDto>> departures = repository.getDeparturesFromPageContent(pageContent, date);
+        List<Optional<EnrichedTrainArrivalDepartureDto>> arrivals =
+                repository.getArrivalsFromPageContent(pageContent, date);
+
+        List<Optional<EnrichedTrainArrivalDepartureDto>> departures =
+                repository.getDeparturesFromPageContent(pageContent, date);
 
         return createPairs(arrivals, departures).stream()
                 .map(pair -> adapter.adapt(pair.getKey(), pair.getValue()))
@@ -119,11 +118,8 @@ public class StationService {
     }
 
     @PostConstruct
-    public void init() throws IOException {
-        try (InputStream is = new ClassPathResource("stations.json").getInputStream()) {
-            stations = objectMapper.readValue(is, new TypeReference<>() {
-            });
-        }
+    public void init() {
+        stations = itinerariesRepository.getStations();
     }
 
     public List<StationDto> getAllStations() {
